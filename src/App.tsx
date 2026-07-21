@@ -1,4 +1,4 @@
-import { test } from "@/shared/test";
+import { test } from '@/shared/test';
 
 function App() {
   return <h1>{test}</h1>;

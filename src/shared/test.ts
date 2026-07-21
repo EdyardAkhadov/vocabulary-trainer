@@ -1,1 +1,1 @@
-export const test = "Alias works!";
+export const test = 'Alias works!';

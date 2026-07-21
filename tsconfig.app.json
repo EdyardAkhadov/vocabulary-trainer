@@ -5,11 +5,9 @@
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
     "types": ["vite/client"],
-    
+
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
 
     "allowArbitraryExtensions": true,
@@ -30,6 +28,4 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]
-
-  
 }
