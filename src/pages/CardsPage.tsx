@@ -1,36 +1,36 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
-import { useAppLanguage } from '@/app/providers/LanguageProvider'
-import { Button } from '@/components/ui/button'
-import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api'
-import { getLanguages, type Language } from '@/entities/language/api'
-import { getTopic, type Topic } from '@/entities/topic/api'
-import { getWordEntries, type WordEntry } from '@/entities/word-entry/api'
-import { getLanguageName } from '@/shared/i18n/language-names'
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
+import { Button } from '@/components/ui/button';
+import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
+import { getLanguages, type Language } from '@/entities/language/api';
+import { getTopic, type Topic } from '@/entities/topic/api';
+import { getWordEntries, type WordEntry } from '@/entities/word-entry/api';
+import { getLanguageName } from '@/shared/i18n/language-names';
 
-type CardDirection = 'source-to-target' | 'target-to-source'
+type CardDirection = 'source-to-target' | 'target-to-source';
 
 export function CardsPage() {
-  const { pairId, topicId } = useParams()
-  const { language, t } = useAppLanguage()
+  const { pairId, topicId } = useParams();
+  const { language, t } = useAppLanguage();
 
-  const [topic, setTopic] = useState<Topic | null>(null)
-  const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null)
-  const [languages, setLanguages] = useState<Language[] | null>(null)
-  const [wordEntries, setWordEntries] = useState<WordEntry[] | null>(null)
-  const [direction, setDirection] = useState<CardDirection>('source-to-target')
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isFlipped, setIsFlipped] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null);
+  const [languages, setLanguages] = useState<Language[] | null>(null);
+  const [wordEntries, setWordEntries] = useState<WordEntry[] | null>(null);
+  const [direction, setDirection] = useState<CardDirection>('source-to-target');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!pairId || !topicId) {
-      return
+      return;
     }
 
-    const currentPairId = pairId
-    const currentTopicId = topicId
+    const currentPairId = pairId;
+    const currentTopicId = topicId;
 
     async function loadData() {
       try {
@@ -39,35 +39,35 @@ export function CardsPage() {
           getLanguagePair(currentPairId),
           getLanguages(),
           getWordEntries(currentTopicId),
-        ])
+        ]);
 
-        setTopic(topicData)
-        setLanguagePair(pairData)
-        setLanguages(languagesData)
-        setWordEntries(wordsData)
+        setTopic(topicData);
+        setLanguagePair(pairData);
+        setLanguages(languagesData);
+        setWordEntries(wordsData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : t.errors.loadCards)
+        setError(err instanceof Error ? err.message : t.errors.loadCards);
       }
     }
 
-    void loadData()
-  }, [pairId, topicId, t.errors.loadCards])
+    void loadData();
+  }, [pairId, topicId, t.errors.loadCards]);
 
   const sourceLanguage = useMemo(() => {
     if (!languagePair || !languages) {
-      return null
+      return null;
     }
 
-    return languages.find((item) => item.id === languagePair.source_language_id) ?? null
-  }, [languagePair, languages])
+    return languages.find((item) => item.id === languagePair.source_language_id) ?? null;
+  }, [languagePair, languages]);
 
   const targetLanguage = useMemo(() => {
     if (!languagePair || !languages) {
-      return null
+      return null;
     }
 
-    return languages.find((item) => item.id === languagePair.target_language_id) ?? null
-  }, [languagePair, languages])
+    return languages.find((item) => item.id === languagePair.target_language_id) ?? null;
+  }, [languagePair, languages]);
 
   if (!pairId || !topicId) {
     return (
@@ -76,7 +76,7 @@ export function CardsPage() {
           <p className="text-destructive">{t.errors.loadCards}</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (error) {
@@ -93,7 +93,7 @@ export function CardsPage() {
           <p className="mt-6 text-destructive">{error}</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (!topic || !languagePair || !languages || !wordEntries) {
@@ -103,7 +103,7 @@ export function CardsPage() {
           <p>{t.common.loading}</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (wordEntries.length === 0) {
@@ -120,55 +120,59 @@ export function CardsPage() {
           <div className="mt-8 rounded-xl border border-dashed p-8 text-center">
             <h1 className="text-xl font-semibold">{t.cards.noCards}</h1>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t.cards.noCardsDescription}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t.cards.noCardsDescription}</p>
           </div>
         </div>
       </main>
-    )
+    );
   }
 
-  const cards = wordEntries
-  const currentWord = cards[currentIndex]
+  const cards = wordEntries;
+  const currentWord = cards[currentIndex];
 
   const sourceLanguageName = sourceLanguage
-    ? getLanguageName(sourceLanguage.code, language, sourceLanguage.native_name || sourceLanguage.name)
-    : t.languagePairs.language1
+    ? getLanguageName(
+        sourceLanguage.code,
+        language,
+        sourceLanguage.native_name || sourceLanguage.name,
+      )
+    : t.languagePairs.language1;
 
   const targetLanguageName = targetLanguage
-    ? getLanguageName(targetLanguage.code, language, targetLanguage.native_name || targetLanguage.name)
-    : t.languagePairs.language2
+    ? getLanguageName(
+        targetLanguage.code,
+        language,
+        targetLanguage.native_name || targetLanguage.name,
+      )
+    : t.languagePairs.language2;
 
   const frontText =
-    direction === 'source-to-target' ? currentWord.source_text : currentWord.target_text
+    direction === 'source-to-target' ? currentWord.source_text : currentWord.target_text;
 
   const backText =
-    direction === 'source-to-target' ? currentWord.target_text : currentWord.source_text
+    direction === 'source-to-target' ? currentWord.target_text : currentWord.source_text;
 
-  const frontLanguage =
-    direction === 'source-to-target' ? sourceLanguageName : targetLanguageName
+  const frontLanguage = direction === 'source-to-target' ? sourceLanguageName : targetLanguageName;
 
-  const backLanguage =
-    direction === 'source-to-target' ? targetLanguageName : sourceLanguageName
+  const backLanguage = direction === 'source-to-target' ? targetLanguageName : sourceLanguageName;
 
   function goPrevious() {
-    setCurrentIndex((current) => (current === 0 ? cards.length - 1 : current - 1))
-    setIsFlipped(false)
+    setCurrentIndex((current) => (current === 0 ? cards.length - 1 : current - 1));
+    setIsFlipped(false);
   }
 
   function goNext() {
-    setCurrentIndex((current) => (current === cards.length - 1 ? 0 : current + 1))
-    setIsFlipped(false)
+    setCurrentIndex((current) => (current === cards.length - 1 ? 0 : current + 1));
+    setIsFlipped(false);
   }
 
   function changeDirection(nextDirection: CardDirection) {
-    setDirection(nextDirection)
-    setIsFlipped(false)
+    setDirection(nextDirection);
+    setIsFlipped(false);
   }
 
   function flipCard() {
-    setIsFlipped((current) => !current)
+    setIsFlipped((current) => !current);
   }
 
   return (
@@ -216,20 +220,20 @@ export function CardsPage() {
           {!isFlipped ? (
             <>
               <p className="text-sm text-muted-foreground">{frontLanguage}</p>
-              <p className="mt-4 break-words text-4xl font-semibold">{frontText}</p>
+              <p className="mt-4 wrap-break-word text-4xl font-semibold">{frontText}</p>
               <p className="mt-8 text-sm text-muted-foreground">{t.cards.reveal}</p>
             </>
           ) : (
             <>
               <p className="text-sm text-muted-foreground">{backLanguage}</p>
-              <p className="mt-4 break-words text-4xl font-semibold">{backText}</p>
+              <p className="mt-4 wrap-break-word text-4xl font-semibold">{backText}</p>
 
               {currentWord.meaning && (
                 <div className="mt-8 w-full border-t pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
                     {t.words.meaning}
                   </p>
-                  <p className="mt-2 break-words text-base">{currentWord.meaning}</p>
+                  <p className="mt-2 wrap-break-word text-base">{currentWord.meaning}</p>
                 </div>
               )}
 
@@ -253,5 +257,5 @@ export function CardsPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }
