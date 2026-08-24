@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
 import { updateWordEntry, type WordEntry } from '@/entities/word-entry/api';
 
 type EditWordEntryFormProps = {
@@ -23,6 +23,7 @@ export function EditWordEntryForm({
   onCancel,
   onError,
 }: EditWordEntryFormProps) {
+  const { t } = useAppLanguage();
   const [sourceText, setSourceText] = useState(wordEntry.source_text);
   const [targetText, setTargetText] = useState(wordEntry.target_text);
   const [meaning, setMeaning] = useState(wordEntry.meaning ?? '');
@@ -30,22 +31,19 @@ export function EditWordEntryForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     onError('');
 
     if (!sourceText.trim() || !targetText.trim()) {
-      onError('Both words are required');
+      onError(t.validation.bothWordsRequired);
       return;
     }
 
     try {
       setIsUpdating(true);
-
       const updatedWordEntry = await updateWordEntry(wordEntry.id, sourceText, targetText, meaning);
-
       onUpdated(updatedWordEntry);
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to update word');
+      onError(err instanceof Error ? err.message : t.errors.updateWord);
     } finally {
       setIsUpdating(false);
     }
@@ -54,13 +52,12 @@ export function EditWordEntryForm({
   return (
     <section className="mt-4 rounded-xl border bg-card p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold">Edit word</h3>
+        <h3 className="text-lg font-semibold">{t.words.editTitle}</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor={`edit-source-${wordEntry.id}`}>{sourceLanguageName}</Label>
-
           <Input
             id={`edit-source-${wordEntry.id}`}
             value={sourceText}
@@ -71,7 +68,6 @@ export function EditWordEntryForm({
 
         <div className="space-y-2">
           <Label htmlFor={`edit-target-${wordEntry.id}`}>{targetLanguageName}</Label>
-
           <Input
             id={`edit-target-${wordEntry.id}`}
             value={targetText}
@@ -82,25 +78,24 @@ export function EditWordEntryForm({
 
         <div className="space-y-2">
           <Label htmlFor={`edit-meaning-${wordEntry.id}`}>
-            Meaning
-            <span className="ml-1 text-muted-foreground">(optional)</span>
+            {t.words.meaning}
+            <span className="ml-1 text-muted-foreground">({t.common.optional})</span>
           </Label>
-
           <Input
             id={`edit-meaning-${wordEntry.id}`}
             value={meaning}
             onChange={(event) => setMeaning(event.target.value)}
+            placeholder={t.placeholders.meaning}
             disabled={isUpdating}
           />
         </div>
 
         <div className="flex gap-2">
           <Button type="submit" disabled={isUpdating}>
-            {isUpdating ? 'Saving...' : 'Save changes'}
+            {isUpdating ? t.common.saving : t.common.saveChanges}
           </Button>
-
           <Button type="button" variant="outline" onClick={onCancel} disabled={isUpdating}>
-            Cancel
+            {t.common.cancel}
           </Button>
         </div>
       </form>

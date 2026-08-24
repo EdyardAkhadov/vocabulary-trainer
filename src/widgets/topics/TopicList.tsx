@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
-
 import type { Topic } from '@/entities/topic/api';
 
 type TopicListProps = {
@@ -11,19 +11,19 @@ type TopicListProps = {
 };
 
 export function TopicList({ topics, onEdit, onDelete }: TopicListProps) {
+  const { t } = useAppLanguage();
+
   return (
     <section className="mt-10">
       <div className="mb-4">
-        <h2 className="text-xl font-semibold">Topics</h2>
-
-        <p className="mt-1 text-sm text-muted-foreground">Your vocabulary groups.</p>
+        <h2 className="text-xl font-semibold">{t.topics.title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t.topics.description}</p>
       </div>
 
       {topics.length === 0 ? (
         <div className="rounded-xl border border-dashed p-8 text-center">
-          <p className="font-medium">No topics yet.</p>
-
-          <p className="mt-1 text-sm text-muted-foreground">Create your first topic above.</p>
+          <p className="font-medium">{t.topics.noTopics}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.topics.noTopicsDescription}</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -35,22 +35,20 @@ export function TopicList({ topics, onEdit, onDelete }: TopicListProps) {
                   className="min-w-0 flex-1"
                 >
                   <p className="font-medium hover:underline">{topic.name}</p>
-
-                  <p className="mt-1 text-sm text-muted-foreground">Open topic</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{t.topics.openTopic}</p>
                 </Link>
 
                 <div className="flex shrink-0 gap-2">
                   <Button type="button" variant="outline" size="sm" onClick={() => onEdit(topic)}>
-                    Edit
+                    {t.common.edit}
                   </Button>
-
                   <Button
                     type="button"
                     variant="destructive"
                     size="sm"
                     onClick={() => onDelete(topic)}
                   >
-                    Delete
+                    {t.common.delete}
                   </Button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,9 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
 import { updateLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
 import type { Language } from '@/entities/language/api';
+import { getLanguageName } from '@/shared/i18n/language-names';
 
 type EditLanguagePairFormProps = {
   languagePair: LanguagePair;
@@ -29,46 +30,42 @@ export function EditLanguagePairForm({
   onCancel,
   onError,
 }: EditLanguagePairFormProps) {
+  const { language: appLanguage, t } = useAppLanguage();
   const [sourceLanguageId, setSourceLanguageId] = useState(languagePair.source_language_id);
-
   const [targetLanguageId, setTargetLanguageId] = useState(languagePair.target_language_id);
-
   const [name, setName] = useState(languagePair.name);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const languageItems = languages.map((language) => ({
     value: language.id,
-    label: language.name,
+    label: getLanguageName(language.code, appLanguage, language.name),
   }));
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     onError('');
 
     if (!sourceLanguageId || !targetLanguageId || !name.trim()) {
-      onError('Please fill in all fields');
+      onError(t.validation.fillAllFields);
       return;
     }
 
     if (sourceLanguageId === targetLanguageId) {
-      onError('Languages must be different');
+      onError(t.validation.differentLanguages);
       return;
     }
 
     try {
       setIsUpdating(true);
-
       const updatedPair = await updateLanguagePair(
         languagePair.id,
         sourceLanguageId,
         targetLanguageId,
-        name,
+        name.trim(),
       );
-
       onUpdated(updatedPair);
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to update language pair');
+      onError(err instanceof Error ? err.message : t.errors.updatePair);
     } finally {
       setIsUpdating(false);
     }
@@ -77,13 +74,12 @@ export function EditLanguagePairForm({
   return (
     <section className="mt-4 rounded-xl border bg-card p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold">Edit language pair</h3>
+        <h3 className="text-lg font-semibold">{t.languagePairs.editTitle}</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="edit-source-language">Language 1</Label>
-
+          <Label htmlFor="edit-source-language">{t.languagePairs.language1}</Label>
           <Select
             items={languageItems}
             value={sourceLanguageId || null}
@@ -91,13 +87,12 @@ export function EditLanguagePairForm({
             disabled={isUpdating}
           >
             <SelectTrigger id="edit-source-language" className="w-full">
-              <SelectValue placeholder="Select language" />
+              <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
-
             <SelectContent>
               {languages.map((language) => (
                 <SelectItem key={language.id} value={language.id}>
-                  {language.name}
+                  {getLanguageName(language.code, appLanguage, language.name)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -105,8 +100,7 @@ export function EditLanguagePairForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="edit-target-language">Language 2</Label>
-
+          <Label htmlFor="edit-target-language">{t.languagePairs.language2}</Label>
           <Select
             items={languageItems}
             value={targetLanguageId || null}
@@ -114,13 +108,12 @@ export function EditLanguagePairForm({
             disabled={isUpdating}
           >
             <SelectTrigger id="edit-target-language" className="w-full">
-              <SelectValue placeholder="Select language" />
+              <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
-
             <SelectContent>
               {languages.map((language) => (
                 <SelectItem key={language.id} value={language.id}>
-                  {language.name}
+                  {getLanguageName(language.code, appLanguage, language.name)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -128,8 +121,7 @@ export function EditLanguagePairForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="edit-pair-name">Name</Label>
-
+          <Label htmlFor="edit-pair-name">{t.languagePairs.name}</Label>
           <Input
             id="edit-pair-name"
             value={name}
@@ -140,11 +132,10 @@ export function EditLanguagePairForm({
 
         <div className="flex gap-2">
           <Button type="submit" disabled={isUpdating}>
-            {isUpdating ? 'Saving...' : 'Save changes'}
+            {isUpdating ? t.common.saving : t.common.saveChanges}
           </Button>
-
           <Button type="button" variant="outline" onClick={onCancel} disabled={isUpdating}>
-            Cancel
+            {t.common.cancel}
           </Button>
         </div>
       </form>

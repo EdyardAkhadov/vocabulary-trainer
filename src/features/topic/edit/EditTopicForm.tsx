@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
 import { updateTopic, type Topic } from '@/entities/topic/api';
 
 type EditTopicFormProps = {
@@ -14,27 +14,25 @@ type EditTopicFormProps = {
 };
 
 export function EditTopicForm({ topic, onUpdated, onCancel, onError }: EditTopicFormProps) {
+  const { t } = useAppLanguage();
   const [name, setName] = useState(topic.name);
   const [isUpdating, setIsUpdating] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     onError('');
 
     if (!name.trim()) {
-      onError('Please enter a topic name');
+      onError(t.validation.topicNameRequired);
       return;
     }
 
     try {
       setIsUpdating(true);
-
-      const updatedTopic = await updateTopic(topic.id, name);
-
+      const updatedTopic = await updateTopic(topic.id, name.trim());
       onUpdated(updatedTopic);
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to update topic');
+      onError(err instanceof Error ? err.message : t.errors.updateTopic);
     } finally {
       setIsUpdating(false);
     }
@@ -43,13 +41,12 @@ export function EditTopicForm({ topic, onUpdated, onCancel, onError }: EditTopic
   return (
     <section className="mt-4 rounded-xl border bg-card p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold">Edit topic</h3>
+        <h3 className="text-lg font-semibold">{t.topics.editTitle}</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="edit-topic-name">Topic name</Label>
-
+          <Label htmlFor="edit-topic-name">{t.topics.topicName}</Label>
           <Input
             id="edit-topic-name"
             value={name}
@@ -60,11 +57,10 @@ export function EditTopicForm({ topic, onUpdated, onCancel, onError }: EditTopic
 
         <div className="flex gap-2">
           <Button type="submit" disabled={isUpdating}>
-            {isUpdating ? 'Saving...' : 'Save changes'}
+            {isUpdating ? t.common.saving : t.common.saveChanges}
           </Button>
-
           <Button type="button" variant="outline" onClick={onCancel} disabled={isUpdating}>
-            Cancel
+            {t.common.cancel}
           </Button>
         </div>
       </form>

@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
 import { createWordEntry, type WordEntry } from '@/entities/word-entry/api';
 
 type CreateWordEntryFormProps = {
@@ -21,6 +21,7 @@ export function CreateWordEntryForm({
   onCreated,
   onError,
 }: CreateWordEntryFormProps) {
+  const { t } = useAppLanguage();
   const [sourceText, setSourceText] = useState('');
   const [targetText, setTargetText] = useState('');
   const [meaning, setMeaning] = useState('');
@@ -28,26 +29,22 @@ export function CreateWordEntryForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     onError('');
 
     if (!sourceText.trim() || !targetText.trim()) {
-      onError('Both words are required');
+      onError(t.validation.bothWordsRequired);
       return;
     }
 
     try {
       setIsCreating(true);
-
       const wordEntry = await createWordEntry(topicId, sourceText, targetText, meaning);
-
       onCreated(wordEntry);
-
       setSourceText('');
       setTargetText('');
       setMeaning('');
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to create word');
+      onError(err instanceof Error ? err.message : t.errors.createWord);
     } finally {
       setIsCreating(false);
     }
@@ -56,55 +53,49 @@ export function CreateWordEntryForm({
   return (
     <section className="rounded-xl border bg-card p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold">Add word</h2>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Add a word and its translation to this topic.
-        </p>
+        <h2 className="text-xl font-semibold">{t.words.addTitle}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t.words.addDescription}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="source-word">{sourceLanguageName}</Label>
-
           <Input
             id="source-word"
             value={sourceText}
             onChange={(event) => setSourceText(event.target.value)}
-            placeholder="bank"
+            placeholder={t.placeholders.sourceWord}
             disabled={isCreating}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="target-word">{targetLanguageName}</Label>
-
           <Input
             id="target-word"
             value={targetText}
             onChange={(event) => setTargetText(event.target.value)}
-            placeholder="банк"
+            placeholder={t.placeholders.targetWord}
             disabled={isCreating}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="word-meaning">
-            Meaning
-            <span className="ml-1 text-muted-foreground">(optional)</span>
+            {t.words.meaning}
+            <span className="ml-1 text-muted-foreground">({t.common.optional})</span>
           </Label>
-
           <Input
             id="word-meaning"
             value={meaning}
             onChange={(event) => setMeaning(event.target.value)}
-            placeholder="financial institution"
+            placeholder={t.placeholders.meaning}
             disabled={isCreating}
           />
         </div>
 
         <Button type="submit" disabled={isCreating}>
-          {isCreating ? 'Adding...' : 'Add word'}
+          {isCreating ? t.words.adding : t.words.addButton}
         </Button>
       </form>
     </section>

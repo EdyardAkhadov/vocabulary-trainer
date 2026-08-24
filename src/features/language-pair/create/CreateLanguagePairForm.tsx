@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,9 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
 import { createLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
 import type { Language } from '@/entities/language/api';
+import { getLanguageName } from '@/shared/i18n/language-names';
 
 type CreateLanguagePairFormProps = {
   languages: Language[];
@@ -25,6 +26,7 @@ export function CreateLanguagePairForm({
   onCreated,
   onError,
 }: CreateLanguagePairFormProps) {
+  const { language: appLanguage, t } = useAppLanguage();
   const [sourceLanguageId, setSourceLanguageId] = useState('');
   const [targetLanguageId, setTargetLanguageId] = useState('');
   const [name, setName] = useState('');
@@ -32,21 +34,20 @@ export function CreateLanguagePairForm({
 
   const languageItems = languages.map((language) => ({
     value: language.id,
-    label: language.name,
+    label: getLanguageName(language.code, appLanguage, language.name),
   }));
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     onError('');
 
     if (!sourceLanguageId || !targetLanguageId || !name.trim()) {
-      onError('Please fill in all fields');
+      onError(t.validation.fillAllFields);
       return;
     }
 
     if (sourceLanguageId === targetLanguageId) {
-      onError('Languages must be different');
+      onError(t.validation.differentLanguages);
       return;
     }
 
@@ -60,12 +61,11 @@ export function CreateLanguagePairForm({
       );
 
       onCreated(languagePair);
-
       setName('');
       setSourceLanguageId('');
       setTargetLanguageId('');
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'Failed to create language pair');
+      onError(err instanceof Error ? err.message : t.errors.createPair);
     } finally {
       setIsCreating(false);
     }
@@ -74,17 +74,15 @@ export function CreateLanguagePairForm({
   return (
     <section className="rounded-xl border bg-card p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold">Create language pair</h2>
-
+        <h2 className="text-xl font-semibold">{t.languagePairs.createTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Choose the two languages you want to practice.
+          {t.languagePairs.createDescription}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="source-language">Language 1</Label>
-
+          <Label htmlFor="source-language">{t.languagePairs.language1}</Label>
           <Select
             items={languageItems}
             value={sourceLanguageId || null}
@@ -92,13 +90,12 @@ export function CreateLanguagePairForm({
             disabled={isCreating}
           >
             <SelectTrigger id="source-language" className="w-full">
-              <SelectValue placeholder="Select language" />
+              <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
-
             <SelectContent>
               {languages.map((language) => (
                 <SelectItem key={language.id} value={language.id}>
-                  {language.name}
+                  {getLanguageName(language.code, appLanguage, language.name)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -106,8 +103,7 @@ export function CreateLanguagePairForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="target-language">Language 2</Label>
-
+          <Label htmlFor="target-language">{t.languagePairs.language2}</Label>
           <Select
             items={languageItems}
             value={targetLanguageId || null}
@@ -115,13 +111,12 @@ export function CreateLanguagePairForm({
             disabled={isCreating}
           >
             <SelectTrigger id="target-language" className="w-full">
-              <SelectValue placeholder="Select language" />
+              <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
-
             <SelectContent>
               {languages.map((language) => (
                 <SelectItem key={language.id} value={language.id}>
-                  {language.name}
+                  {getLanguageName(language.code, appLanguage, language.name)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -129,19 +124,18 @@ export function CreateLanguagePairForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pair-name">Name</Label>
-
+          <Label htmlFor="pair-name">{t.languagePairs.name}</Label>
           <Input
             id="pair-name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="English vocabulary"
+            placeholder={t.languagePairs.namePlaceholder}
             disabled={isCreating}
           />
         </div>
 
         <Button type="submit" disabled={isCreating} className="w-full">
-          {isCreating ? 'Creating...' : 'Create'}
+          {isCreating ? t.languagePairs.creating : t.languagePairs.createButton}
         </Button>
       </form>
     </section>

@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
 import { getLanguages, type Language } from '@/entities/language/api';
 import { deleteTopic, getTopics, type Topic } from '@/entities/topic/api';
 import { CreateTopicForm } from '@/features/topic/create/CreateTopicForm';
 import { EditTopicForm } from '@/features/topic/edit/EditTopicForm';
+import { getLanguageName } from '@/shared/i18n/language-names';
 import { TopicList } from '@/widgets/topics/TopicList';
 
 export function LanguagePairPage() {
   const { pairId } = useParams();
+  const { language: appLanguage, t } = useAppLanguage();
 
   const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null);
-
   const [languages, setLanguages] = useState<Language[] | null>(null);
-
   const [topics, setTopics] = useState<Topic[] | null>(null);
-
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,22 +39,21 @@ export function LanguagePairPage() {
         setLanguages(languagesData);
         setTopics(topicsData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load language pair');
+        setError(err instanceof Error ? err.message : t.errors.loadPair);
       }
     }
 
-    loadData();
-  }, [pairId]);
+    void loadData();
+  }, [pairId, t.errors.loadPair]);
 
   if (!pairId) {
     return (
       <main className="min-h-screen bg-background p-8">
         <div className="mx-auto max-w-3xl">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Back to language pairs
+            ← {t.common.back}
           </Link>
-
-          <p className="mt-6 text-destructive">Language pair not found.</p>
+          <p className="mt-6 text-destructive">{t.languagePairs.notFound}</p>
         </div>
       </main>
     );
@@ -66,9 +64,8 @@ export function LanguagePairPage() {
       <main className="min-h-screen bg-background p-8">
         <div className="mx-auto max-w-3xl">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Back to language pairs
+            ← {t.common.back}
           </Link>
-
           <p className="mt-6 text-destructive">{error}</p>
         </div>
       </main>
@@ -78,9 +75,7 @@ export function LanguagePairPage() {
   if (!languagePair || !languages || !topics) {
     return (
       <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
-          <p>Loading...</p>
-        </div>
+        <div className="mx-auto max-w-3xl">{t.common.loading}</div>
       </main>
     );
   }
@@ -88,36 +83,33 @@ export function LanguagePairPage() {
   const sourceLanguage = languages.find(
     (language) => language.id === languagePair.source_language_id,
   );
-
   const targetLanguage = languages.find(
     (language) => language.id === languagePair.target_language_id,
   );
 
-  function handleTopicCreated(topic: Topic) {
-    setTopics((current) => {
-      if (!current) {
-        return [topic];
-      }
+  const sourceLanguageName = sourceLanguage
+    ? getLanguageName(sourceLanguage.code, appLanguage, sourceLanguage.name)
+    : t.common.unknown;
+  const targetLanguageName = targetLanguage
+    ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
+    : t.common.unknown;
 
-      return [...current, topic];
-    });
+  function handleTopicCreated(topic: Topic) {
+    setTopics((current) => (current ? [...current, topic] : [topic]));
   }
 
   function handleTopicUpdated(updatedTopic: Topic) {
-    setTopics((current) => {
-      if (!current) {
-        return [updatedTopic];
-      }
-
-      return current.map((topic) => (topic.id === updatedTopic.id ? updatedTopic : topic));
-    });
-
+    setTopics((current) =>
+      current
+        ? current.map((topic) => (topic.id === updatedTopic.id ? updatedTopic : topic))
+        : [updatedTopic],
+    );
     setEditingTopic(null);
   }
 
   async function handleTopicDelete(topic: Topic) {
     const confirmed = window.confirm(
-      `Delete "${topic.name}"?\n\nThis will also delete all words and study progress inside this topic.`,
+      `${t.confirmations.deleteTopicTitle}\n\n${topic.name}\n\n${t.confirmations.deleteTopic}`,
     );
 
     if (!confirmed) {
@@ -128,20 +120,15 @@ export function LanguagePairPage() {
 
     try {
       await deleteTopic(topic.id);
-
-      setTopics((current) => {
-        if (!current) {
-          return [];
-        }
-
-        return current.filter((currentTopic) => currentTopic.id !== topic.id);
-      });
+      setTopics((current) =>
+        current ? current.filter((currentTopic) => currentTopic.id !== topic.id) : [],
+      );
 
       if (editingTopic?.id === topic.id) {
         setEditingTopic(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete topic');
+      setError(err instanceof Error ? err.message : t.errors.deleteTopic);
     }
   }
 
@@ -149,16 +136,13 @@ export function LanguagePairPage() {
     <main className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Back to language pairs
+          ← {t.common.back}
         </Link>
 
         <div className="mt-6">
           <h1 className="text-3xl font-bold tracking-tight">{languagePair.name}</h1>
-
           <p className="mt-2 text-muted-foreground">
-            {sourceLanguage?.name ?? 'Unknown'}
-            {' → '}
-            {targetLanguage?.name ?? 'Unknown'}
+            {sourceLanguageName} {' → '} {targetLanguageName}
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import {
   deleteLanguagePair,
   getLanguagePairs,
@@ -13,12 +14,11 @@ import { LanguagePairList } from '@/widgets/language-pairs/LanguagePairList';
 
 export function LanguagePairsPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const { t } = useAppLanguage();
 
   const [languages, setLanguages] = useState<Language[] | null>(null);
   const [languagePairs, setLanguagePairs] = useState<LanguagePair[] | null>(null);
-
   const [editingPair, setEditingPair] = useState<LanguagePair | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,54 +29,42 @@ export function LanguagePairsPage() {
     async function loadData() {
       try {
         const [languagesData, pairsData] = await Promise.all([getLanguages(), getLanguagePairs()]);
-
         setLanguages(languagesData);
         setLanguagePairs(pairsData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data');
+        setError(err instanceof Error ? err.message : t.errors.loadData);
       }
     }
 
-    loadData();
-  }, [user]);
+    void loadData();
+  }, [user, t.errors.loadData]);
 
   if (isAuthLoading) {
-    return <div className="p-8">Loading...</div>;
+    return <div className="p-8">{t.common.loading}</div>;
   }
 
   if (!user) {
-    return <div className="p-8">Not authenticated</div>;
+    return <div className="p-8">{t.common.notAuthenticated}</div>;
   }
 
   if (languages === null || languagePairs === null) {
-    return <div className="p-8">Loading data...</div>;
+    return <div className="p-8">{t.common.loading}</div>;
   }
 
   function handleLanguagePairCreated(languagePair: LanguagePair) {
-    setLanguagePairs((current) => {
-      if (!current) {
-        return [languagePair];
-      }
-
-      return [languagePair, ...current];
-    });
+    setLanguagePairs((current) => (current ? [languagePair, ...current] : [languagePair]));
   }
 
   function handleLanguagePairUpdated(updatedPair: LanguagePair) {
-    setLanguagePairs((current) => {
-      if (!current) {
-        return [updatedPair];
-      }
-
-      return current.map((pair) => (pair.id === updatedPair.id ? updatedPair : pair));
-    });
-
+    setLanguagePairs((current) =>
+      current ? current.map((pair) => (pair.id === updatedPair.id ? updatedPair : pair)) : [updatedPair],
+    );
     setEditingPair(null);
   }
 
   async function handleLanguagePairDelete(languagePair: LanguagePair) {
     const confirmed = window.confirm(
-      `Delete "${languagePair.name}"?\n\nThis will also delete all topics, words and study progress inside this language pair.`,
+      `${t.confirmations.deletePairTitle}\n\n${languagePair.name}\n\n${t.confirmations.deletePair}`,
     );
 
     if (!confirmed) {
@@ -87,20 +75,15 @@ export function LanguagePairsPage() {
 
     try {
       await deleteLanguagePair(languagePair.id);
-
-      setLanguagePairs((current) => {
-        if (!current) {
-          return [];
-        }
-
-        return current.filter((pair) => pair.id !== languagePair.id);
-      });
+      setLanguagePairs((current) =>
+        current ? current.filter((pair) => pair.id !== languagePair.id) : [],
+      );
 
       if (editingPair?.id === languagePair.id) {
         setEditingPair(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete language pair');
+      setError(err instanceof Error ? err.message : t.errors.deletePair);
     }
   }
 
@@ -108,9 +91,8 @@ export function LanguagePairsPage() {
     <main className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Vocabulary Trainer</h1>
-
-          <p className="mt-2 text-sm text-muted-foreground">{user.email}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t.languagePairs.pageTitle}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t.languagePairs.pageDescription}</p>
         </div>
 
         {error && (
