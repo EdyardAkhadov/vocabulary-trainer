@@ -72,7 +72,7 @@ export function CreateLanguagePairForm({
   }
 
   return (
-    <section className="rounded-xl border bg-card p-6">
+    <section className="rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold">{t.languagePairs.createTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -89,7 +89,7 @@ export function CreateLanguagePairForm({
             onValueChange={(value) => setSourceLanguageId(value ?? '')}
             disabled={isCreating}
           >
-            <SelectTrigger id="source-language" className="w-full">
+            <SelectTrigger id="source-language" className="min-h-11 w-full">
               <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
             <SelectContent>
@@ -110,7 +110,7 @@ export function CreateLanguagePairForm({
             onValueChange={(value) => setTargetLanguageId(value ?? '')}
             disabled={isCreating}
           >
-            <SelectTrigger id="target-language" className="w-full">
+            <SelectTrigger id="target-language" className="min-h-11 w-full">
               <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
             <SelectContent>
@@ -134,7 +134,7 @@ export function CreateLanguagePairForm({
           />
         </div>
 
-        <Button type="submit" disabled={isCreating} className="w-full">
+        <Button type="submit" disabled={isCreating} className="min-h-11 w-full">
           {isCreating ? t.languagePairs.creating : t.languagePairs.createButton}
         </Button>
       </form>

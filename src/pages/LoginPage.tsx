@@ -57,13 +57,13 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <img src="/vocab_logo.png" alt="Vocab" className="h-14 w-auto" />
+          <img src="/vocab_logo.png" alt="Vocab" className="h-12 w-auto sm:h-14" />
         </div>
 
-        <section className="rounded-2xl border bg-card p-8 shadow-sm">
+        <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
           <div className="text-center">
             <h1 className="text-2xl font-semibold">{t.auth.welcomeBack}</h1>
 
@@ -113,7 +113,7 @@ export function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="min-h-11 w-full" disabled={isSubmitting}>
               {isSubmitting ? t.auth.signingIn : t.auth.signIn}
             </Button>
           </form>

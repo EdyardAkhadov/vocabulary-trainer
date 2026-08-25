@@ -100,3 +100,14 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
+
+@layer base {
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+  }
+}

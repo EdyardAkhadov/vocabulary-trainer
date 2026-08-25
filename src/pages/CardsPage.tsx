@@ -71,8 +71,8 @@ export function CardsPage() {
 
   if (!pairId || !topicId) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <p className="text-destructive">{t.errors.loadCards}</p>
         </div>
       </main>
@@ -81,8 +81,8 @@ export function CardsPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -98,8 +98,8 @@ export function CardsPage() {
 
   if (!topic || !languagePair || !languages || !wordEntries) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <p>{t.common.loading}</p>
         </div>
       </main>
@@ -108,8 +108,8 @@ export function CardsPage() {
 
   if (wordEntries.length === 0) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -176,8 +176,8 @@ export function CardsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link
           to={`/pair/${pairId}/topic/${topicId}`}
           className="text-sm text-muted-foreground hover:text-foreground"
@@ -186,15 +186,16 @@ export function CardsPage() {
         </Link>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-bold tracking-tight">{t.cards.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.cards.title}</h1>
           <p className="mt-2 text-muted-foreground">{topic.name}</p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-5 grid gap-2 sm:mt-6 sm:grid-cols-2">
           <Button
             type="button"
             variant={direction === 'source-to-target' ? 'default' : 'outline'}
             onClick={() => changeDirection('source-to-target')}
+            className="min-h-11 h-auto whitespace-normal px-3 py-2"
           >
             {sourceLanguageName} → {targetLanguageName}
           </Button>
@@ -203,6 +204,7 @@ export function CardsPage() {
             type="button"
             variant={direction === 'target-to-source' ? 'default' : 'outline'}
             onClick={() => changeDirection('target-to-source')}
+            className="min-h-11 h-auto whitespace-normal px-3 py-2"
           >
             {targetLanguageName} → {sourceLanguageName}
           </Button>
@@ -215,18 +217,18 @@ export function CardsPage() {
         <button
           type="button"
           onClick={flipCard}
-          className="mt-4 flex min-h-80 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border bg-card p-8 text-center shadow-sm transition hover:shadow-md"
+          className="mt-4 flex min-h-[22rem] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border bg-card p-5 text-center shadow-sm transition active:scale-[0.995] sm:min-h-80 sm:p-8 sm:hover:shadow-md"
         >
           {!isFlipped ? (
             <>
               <p className="text-sm text-muted-foreground">{frontLanguage}</p>
-              <p className="mt-4 wrap-break-word text-4xl font-semibold">{frontText}</p>
+              <p className="mt-4 wrap-break-word text-3xl font-semibold sm:text-4xl">{frontText}</p>
               <p className="mt-8 text-sm text-muted-foreground">{t.cards.reveal}</p>
             </>
           ) : (
             <>
               <p className="text-sm text-muted-foreground">{backLanguage}</p>
-              <p className="mt-4 wrap-break-word text-4xl font-semibold">{backText}</p>
+              <p className="mt-4 wrap-break-word text-3xl font-semibold sm:text-4xl">{backText}</p>
 
               {currentWord.meaning && (
                 <div className="mt-8 w-full border-t pt-6">
@@ -242,16 +244,16 @@ export function CardsPage() {
           )}
         </button>
 
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <Button type="button" variant="outline" onClick={goPrevious}>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:grid-cols-3">
+          <Button type="button" variant="outline" onClick={goPrevious} className="order-2 min-h-11 sm:order-1">
             ← {t.cards.previous}
           </Button>
 
-          <Button type="button" onClick={flipCard}>
+          <Button type="button" onClick={flipCard} className="order-1 col-span-2 min-h-11 sm:order-2 sm:col-span-1">
             {t.cards.flip}
           </Button>
 
-          <Button type="button" variant="outline" onClick={goNext}>
+          <Button type="button" variant="outline" onClick={goNext} className="order-3 min-h-11">
             {t.cards.next} →
           </Button>
         </div>

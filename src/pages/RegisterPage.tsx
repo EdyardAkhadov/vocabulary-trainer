@@ -121,18 +121,18 @@ export function RegisterPage() {
 
   if (success) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+      <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
         <div className="w-full max-w-md text-center">
-          <img src="/vocab_logo.png" alt="Vocab" className="mx-auto h-14 w-auto" />
+          <img src="/vocab_logo.png" alt="Vocab" className="mx-auto h-12 w-auto sm:h-14" />
 
-          <section className="mt-8 rounded-2xl border bg-card p-8 shadow-sm">
+          <section className="mt-8 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
             <h1 className="text-2xl font-semibold">{t.auth.checkEmail}</h1>
 
             <p className="mt-3 text-sm text-muted-foreground">{t.auth.confirmationSent}</p>
 
             <Link
               to="/login"
-              className="mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {t.auth.goToSignIn}
             </Link>
@@ -143,13 +143,13 @@ export function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <img src="/vocab_logo.png" alt="Vocab" className="h-14 w-auto" />
+          <img src="/vocab_logo.png" alt="Vocab" className="h-12 w-auto sm:h-14" />
         </div>
 
-        <section className="rounded-2xl border bg-card p-8 shadow-sm">
+        <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
           <div className="text-center">
             <h1 className="text-2xl font-semibold">{t.auth.createAccount}</h1>
 
@@ -189,7 +189,7 @@ export function RegisterPage() {
                 }}
                 disabled={isSubmitting}
               >
-                <SelectTrigger id="register-language" className="w-full">
+                <SelectTrigger id="register-language" className="min-h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
 
@@ -245,7 +245,7 @@ export function RegisterPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="min-h-11 w-full" disabled={isSubmitting}>
               {isSubmitting ? t.auth.creatingAccount : t.auth.createAccount}
             </Button>
           </form>

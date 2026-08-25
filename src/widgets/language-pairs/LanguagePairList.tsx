@@ -22,14 +22,14 @@ export function LanguagePairList({
   const { language: appLanguage, t } = useAppLanguage();
 
   return (
-    <section className="mt-10">
+    <section className="mt-8 sm:mt-10">
       <div className="mb-4">
         <h2 className="text-xl font-semibold">{t.languagePairs.listTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t.languagePairs.listDescription}</p>
       </div>
 
       {languagePairs.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-8 text-center">
+        <div className="rounded-xl border border-dashed p-6 text-center sm:p-8">
           <p className="font-medium">{t.languagePairs.noPairs}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {t.languagePairs.noPairsDescription}
@@ -53,23 +53,23 @@ export function LanguagePairList({
               : t.common.unknown;
 
             return (
-              <article key={pair.id} className="rounded-xl border bg-card p-5">
-                <div className="flex items-start justify-between gap-4">
+              <article key={pair.id} className="rounded-xl border bg-card p-4 sm:p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <Link to={`/pair/${pair.id}`} className="min-w-0 flex-1">
-                    <p className="font-medium hover:underline">{pair.name}</p>
+                    <p className="wrap-break-word font-medium hover:underline">{pair.name}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {sourceName} {' → '} {targetName}
                     </p>
                   </Link>
 
-                  <div className="flex shrink-0 gap-2">
-                    <Button type="button" variant="outline" size="sm" onClick={() => onEdit(pair)}>
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
+                    <Button type="button" variant="outline" className="min-h-11" onClick={() => onEdit(pair)}>
                       {t.common.edit}
                     </Button>
                     <Button
                       type="button"
                       variant="destructive"
-                      size="sm"
+                      className="min-h-11"
                       onClick={() => onDelete(pair)}
                     >
                       {t.common.delete}

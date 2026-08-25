@@ -170,8 +170,8 @@ export function TestsPage() {
 
   if (!pairId || !topicId) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <p className="text-destructive">{t.errors.loadTest}</p>
         </div>
       </main>
@@ -180,8 +180,8 @@ export function TestsPage() {
 
   if (error && !topic) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -196,8 +196,8 @@ export function TestsPage() {
 
   if (!topic || !languagePair || !languages || !wordEntries) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">{t.common.loading}</div>
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
     )
   }
@@ -267,8 +267,8 @@ export function TestsPage() {
 
   if (words.length === 0) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -276,7 +276,7 @@ export function TestsPage() {
             ← {t.common.back}: {topic.name}
           </Link>
 
-          <div className="mt-8 rounded-xl border border-dashed p-8 text-center">
+          <div className="mt-8 rounded-xl border border-dashed p-6 text-center sm:p-8">
             <h1 className="text-xl font-semibold">{t.test.noWords}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{t.test.noWordsDescription}</p>
           </div>
@@ -287,8 +287,8 @@ export function TestsPage() {
 
   if (questions === null) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -297,7 +297,7 @@ export function TestsPage() {
           </Link>
 
           <div className="mt-6">
-            <h1 className="text-3xl font-bold tracking-tight">{t.test.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.test.title}</h1>
             <p className="mt-2 text-muted-foreground">{topic.name}</p>
           </div>
 
@@ -307,7 +307,7 @@ export function TestsPage() {
             </div>
           )}
 
-          <section className="mt-8 rounded-xl border bg-card p-6">
+          <section className="mt-8 rounded-xl border bg-card p-4 sm:p-6">
             <h2 className="text-xl font-semibold">{t.test.mode}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t.test.modeDescription}</p>
 
@@ -315,7 +315,7 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'source-to-target' ? 'default' : 'outline'}
-                className="h-auto min-h-16"
+                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
                 onClick={() => setMode('source-to-target')}
               >
                 {sourceLanguageName} → {targetLanguageName}
@@ -324,7 +324,7 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'target-to-source' ? 'default' : 'outline'}
-                className="h-auto min-h-16"
+                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
                 onClick={() => setMode('target-to-source')}
               >
                 {targetLanguageName} → {sourceLanguageName}
@@ -333,7 +333,7 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'meaning-to-source' ? 'default' : 'outline'}
-                className="h-auto min-h-16"
+                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
                 onClick={() => setMode('meaning-to-source')}
               >
                 {t.words.meaning} → {sourceLanguageName}
@@ -342,14 +342,14 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'meaning-to-target' ? 'default' : 'outline'}
-                className="h-auto min-h-16"
+                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
                 onClick={() => setMode('meaning-to-target')}
               >
                 {t.words.meaning} → {targetLanguageName}
               </Button>
             </div>
 
-            <Button type="button" className="mt-6 w-full" onClick={startTest}>
+            <Button type="button" className="mt-6 min-h-11 w-full" onClick={startTest}>
               {t.test.start}
             </Button>
           </section>
@@ -362,23 +362,23 @@ export function TestsPage() {
     const percentage = Math.round((correctAnswers / questions.length) * 100)
 
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
-          <div className="rounded-2xl border bg-card p-8 text-center">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+          <div className="rounded-2xl border bg-card p-5 text-center sm:p-8">
             <p className="text-sm text-muted-foreground">{t.test.complete}</p>
             <h1 className="mt-3 text-4xl font-bold">{percentage}%</h1>
             <p className="mt-3 text-muted-foreground">
               {correctAnswers} {t.test.correctCount} / {questions.length}
             </p>
 
-            <div className="mt-8 flex justify-center gap-3">
+            <div className="mt-8 grid gap-3 sm:flex sm:justify-center">
               <Button type="button" onClick={restartTest}>
                 {t.test.tryAgain}
               </Button>
 
               <Link
                 to={`/pair/${pairId}/topic/${topicId}`}
-                className="inline-flex h-8 items-center justify-center rounded-lg border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
               >
                 {t.test.backToTopic}
               </Link>
@@ -394,8 +394,8 @@ export function TestsPage() {
   const selectedWasCorrect = selectedAnswer === currentQuestion.correctAnswer
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link
           to={`/pair/${pairId}/topic/${topicId}`}
           className="text-sm text-muted-foreground hover:text-foreground"
@@ -403,7 +403,7 @@ export function TestsPage() {
           ← {t.test.exit}
         </Link>
 
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold">{topic.name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -422,10 +422,10 @@ export function TestsPage() {
           </div>
         )}
 
-        <section className="mt-8 rounded-2xl border bg-card p-8">
+        <section className="mt-8 rounded-2xl border bg-card p-4 sm:p-8">
           <p className="text-center text-sm text-muted-foreground">{t.test.chooseAnswer}</p>
 
-          <p className="mt-6 break-words text-center text-4xl font-semibold">
+          <p className="mt-6 wrap-break-word text-center text-3xl font-semibold sm:text-4xl">
             {currentQuestion.question}
           </p>
 
@@ -434,11 +434,11 @@ export function TestsPage() {
               const isCorrectOption = option === currentQuestion.correctAnswer
               const isSelected = option === selectedAnswer
 
-              let optionClassName = 'min-h-16 h-auto whitespace-normal'
+              let optionClassName = 'min-h-14 h-auto whitespace-normal px-4 py-3 text-base sm:min-h-16'
 
               if (isAnswered) {
                 if (isCorrectOption) {
-                  optionClassName += ' border-green-600 bg-green-50 text-green-900'
+                  optionClassName += ' border-green-600 bg-green-500/10 text-green-700 dark:text-green-400'
                 } else if (isSelected) {
                   optionClassName += ' border-destructive bg-destructive/10 text-destructive'
                 }
@@ -464,7 +464,7 @@ export function TestsPage() {
               <p
                 className={
                   selectedWasCorrect
-                    ? 'font-semibold text-green-700'
+                    ? 'font-semibold text-green-700 dark:text-green-400'
                     : 'font-semibold text-destructive'
                 }
               >
@@ -485,7 +485,7 @@ export function TestsPage() {
 
               <Button
                 type="button"
-                className="mt-6 w-full"
+                className="mt-6 min-h-11 w-full"
                 disabled={isSavingResult}
                 onClick={nextQuestion}
               >

@@ -28,11 +28,11 @@ export function ProgressPage() {
   }, [t]);
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-background px-6 py-10">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex items-start justify-between gap-4">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-10">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t.progress.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.progress.title}</h1>
 
             <p className="mt-2 text-muted-foreground">{t.progress.description}</p>
           </div>
@@ -72,7 +72,7 @@ export function ProgressPage() {
               <StatCard label={t.progress.words} value={stats.words} />
             </section>
 
-            <section className="mt-8 rounded-2xl border bg-card p-6 shadow-sm">
+            <section className="mt-8 rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
               <h2 className="text-xl font-semibold">{t.progress.accuracy}</h2>
 
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-muted">
@@ -102,7 +102,7 @@ type StatCardProps = {
 
 function StatCard({ label, value }: StatCardProps) {
   return (
-    <div className="rounded-2xl border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5">
       <p className="text-sm text-muted-foreground">{label}</p>
 
       <p className="mt-2 text-3xl font-semibold">{value}</p>

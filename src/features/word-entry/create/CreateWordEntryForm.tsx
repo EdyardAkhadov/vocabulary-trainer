@@ -51,7 +51,7 @@ export function CreateWordEntryForm({
   }
 
   return (
-    <section className="rounded-xl border bg-card p-6">
+    <section className="rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold">{t.words.addTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t.words.addDescription}</p>
@@ -94,7 +94,7 @@ export function CreateWordEntryForm({
           />
         </div>
 
-        <Button type="submit" disabled={isCreating}>
+        <Button type="submit" disabled={isCreating} className="min-h-11 w-full sm:w-auto">
           {isCreating ? t.words.adding : t.words.addButton}
         </Button>
       </form>

@@ -39,7 +39,7 @@ export function EditTopicForm({ topic, onUpdated, onCancel, onError }: EditTopic
   }
 
   return (
-    <section className="mt-4 rounded-xl border bg-card p-6">
+    <section className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold">{t.topics.editTitle}</h3>
       </div>
@@ -56,7 +56,7 @@ export function EditTopicForm({ topic, onUpdated, onCancel, onError }: EditTopic
         </div>
 
         <div className="flex gap-2">
-          <Button type="submit" disabled={isUpdating}>
+          <Button type="submit" disabled={isUpdating} className="min-h-11 w-full sm:w-auto">
             {isUpdating ? t.common.saving : t.common.saveChanges}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isUpdating}>

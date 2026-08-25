@@ -201,11 +201,11 @@ export function AccountPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-background px-6 py-10">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-10">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t.account.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.account.title}</h1>
 
             <p className="mt-2 text-muted-foreground">{t.account.description}</p>
           </div>
@@ -223,7 +223,7 @@ export function AccountPage() {
 
         {message && <div className="mt-6 rounded-lg border bg-muted/60 p-4 text-sm">{message}</div>}
 
-        <section className="mt-8 rounded-2xl border bg-card p-6 shadow-sm">
+        <section className="mt-8 rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
           <div>
             <h2 className="text-xl font-semibold">{t.account.profile}</h2>
 
@@ -256,7 +256,7 @@ export function AccountPage() {
                 }}
                 disabled={isSavingProfile}
               >
-                <SelectTrigger id="interface-language" className="w-full">
+                <SelectTrigger id="interface-language" className="min-h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
 
@@ -270,7 +270,7 @@ export function AccountPage() {
               </Select>
             </div>
 
-            <Button type="submit" disabled={isSavingProfile}>
+            <Button type="submit" disabled={isSavingProfile} className="w-full sm:w-auto">
               {isSavingProfile ? t.account.saving : t.common.saveChanges}
             </Button>
           </form>
@@ -288,7 +288,7 @@ export function AccountPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-2xl border bg-card p-6 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
           <div>
             <h2 className="text-xl font-semibold">{t.account.emailSection}</h2>
 
@@ -313,13 +313,13 @@ export function AccountPage() {
               </p>
             </div>
 
-            <Button type="submit" variant="outline" disabled={isUpdatingEmail}>
+            <Button type="submit" variant="outline" disabled={isUpdatingEmail} className="w-full sm:w-auto">
               {isUpdatingEmail ? t.account.sending : t.account.changeEmail}
             </Button>
           </form>
         </section>
 
-        <section className="mt-6 rounded-2xl border bg-card p-6 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
           <div>
             <h2 className="text-xl font-semibold">{t.account.security}</h2>
 
@@ -369,13 +369,13 @@ export function AccountPage() {
             </div>
 
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-              <Button type="submit" variant="outline" disabled={isUpdatingPassword}>
+              <Button type="submit" variant="outline" disabled={isUpdatingPassword} className="w-full sm:w-auto">
                 {isUpdatingPassword ? t.account.changing : t.account.changePassword}
               </Button>
 
               <Link
                 to="/forgot-password"
-                className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                className="inline-flex min-h-11 items-center text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
               >
                 {t.account.forgotPassword}
               </Link>
@@ -383,14 +383,14 @@ export function AccountPage() {
           </form>
         </section>
 
-        <section className="mt-6 rounded-2xl border bg-card p-6 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="text-xl font-semibold">{t.account.learning}</h2>
 
           <p className="mt-2 text-sm text-muted-foreground">{t.account.learningDescription}</p>
 
           <Link
             to="/progress"
-            className="mt-5 inline-flex h-9 items-center justify-center rounded-lg border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted"
+            className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg sm:w-auto border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted"
           >
             {t.account.openProgress}
           </Link>

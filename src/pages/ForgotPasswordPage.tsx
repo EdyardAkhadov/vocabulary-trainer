@@ -42,13 +42,13 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <img src="/vocab_logo.png" alt="Vocab" className="h-14 w-auto" />
+          <img src="/vocab_logo.png" alt="Vocab" className="h-12 w-auto sm:h-14" />
         </div>
 
-        <section className="rounded-2xl border bg-card p-8 shadow-sm">
+        <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
           <h1 className="text-2xl font-semibold">{t.recovery.forgotTitle}</h1>
 
           {success ? (
@@ -57,7 +57,7 @@ export function ForgotPasswordPage() {
 
               <Link
                 to="/login"
-                className="mt-6 inline-flex h-9 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {t.recovery.backToSignIn}
               </Link>
@@ -87,7 +87,7 @@ export function ForgotPasswordPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" className="min-h-11 w-full" disabled={isSubmitting}>
                   {isSubmitting ? t.recovery.sending : t.recovery.sendLink}
                 </Button>
               </form>

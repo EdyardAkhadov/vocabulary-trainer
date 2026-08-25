@@ -48,8 +48,8 @@ export function LanguagePairPage() {
 
   if (!pairId) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
@@ -61,8 +61,8 @@ export function LanguagePairPage() {
 
   if (error && !languagePair) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
@@ -74,8 +74,8 @@ export function LanguagePairPage() {
 
   if (!languagePair || !languages || !topics) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">{t.common.loading}</div>
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
     );
   }
@@ -133,14 +133,14 @@ export function LanguagePairPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}
         </Link>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-bold tracking-tight">{languagePair.name}</h1>
+          <h1 className="wrap-break-word text-2xl font-bold tracking-tight sm:text-3xl">{languagePair.name}</h1>
           <p className="mt-2 text-muted-foreground">
             {sourceLanguageName} {' → '} {targetLanguageName}
           </p>
@@ -152,7 +152,7 @@ export function LanguagePairPage() {
           </div>
         )}
 
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <CreateTopicForm
             languagePairId={pairId}
             onCreated={handleTopicCreated}

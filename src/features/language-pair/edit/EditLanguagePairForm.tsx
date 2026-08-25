@@ -72,7 +72,7 @@ export function EditLanguagePairForm({
   }
 
   return (
-    <section className="mt-4 rounded-xl border bg-card p-6">
+    <section className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold">{t.languagePairs.editTitle}</h3>
       </div>
@@ -86,7 +86,7 @@ export function EditLanguagePairForm({
             onValueChange={(value) => setSourceLanguageId(value ?? '')}
             disabled={isUpdating}
           >
-            <SelectTrigger id="edit-source-language" className="w-full">
+            <SelectTrigger id="edit-source-language" className="min-h-11 w-full">
               <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
             <SelectContent>
@@ -107,7 +107,7 @@ export function EditLanguagePairForm({
             onValueChange={(value) => setTargetLanguageId(value ?? '')}
             disabled={isUpdating}
           >
-            <SelectTrigger id="edit-target-language" className="w-full">
+            <SelectTrigger id="edit-target-language" className="min-h-11 w-full">
               <SelectValue placeholder={t.languagePairs.selectLanguage} />
             </SelectTrigger>
             <SelectContent>
@@ -131,7 +131,7 @@ export function EditLanguagePairForm({
         </div>
 
         <div className="flex gap-2">
-          <Button type="submit" disabled={isUpdating}>
+          <Button type="submit" disabled={isUpdating} className="min-h-11 w-full sm:w-auto">
             {isUpdating ? t.common.saving : t.common.saveChanges}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isUpdating}>

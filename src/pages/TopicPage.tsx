@@ -53,8 +53,8 @@ export function TopicPage() {
 
   if (!pairId || !topicId) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
@@ -66,8 +66,8 @@ export function TopicPage() {
 
   if (error && !topic) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
@@ -79,8 +79,8 @@ export function TopicPage() {
 
   if (!topic || !languagePair || !languages || !wordEntries) {
     return (
-      <main className="min-h-screen bg-background p-8">
-        <div className="mx-auto max-w-3xl">{t.common.loading}</div>
+      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
     );
   }
@@ -140,29 +140,29 @@ export function TopicPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-3xl">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}: {languagePair.name}
         </Link>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-bold tracking-tight">{topic.name}</h1>
+          <h1 className="wrap-break-word text-2xl font-bold tracking-tight sm:text-3xl">{topic.name}</h1>
           <p className="mt-2 text-muted-foreground">
             {sourceLanguageName} {' → '} {targetLanguageName}
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
           <Link
             to={`/pair/${pairId}/topic/${topicId}/cards`}
-            className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
           >
             {t.study.studyCards}
           </Link>
           <Link
             to={`/pair/${pairId}/topic/${topicId}/test`}
-            className="inline-flex h-8 items-center justify-center rounded-lg border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
           >
             {t.study.takeTest}
           </Link>
@@ -174,7 +174,7 @@ export function TopicPage() {
           </div>
         )}
 
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <CreateWordEntryForm
             topicId={topicId}
             sourceLanguageName={sourceLanguageName}

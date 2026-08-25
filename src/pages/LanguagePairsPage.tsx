@@ -40,15 +40,15 @@ export function LanguagePairsPage() {
   }, [user, t.errors.loadData]);
 
   if (isAuthLoading) {
-    return <div className="p-8">{t.common.loading}</div>;
+    return <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">{t.common.loading}</div>;
   }
 
   if (!user) {
-    return <div className="p-8">{t.common.notAuthenticated}</div>;
+    return <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">{t.common.notAuthenticated}</div>;
   }
 
   if (languages === null || languagePairs === null) {
-    return <div className="p-8">{t.common.loading}</div>;
+    return <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">{t.common.loading}</div>;
   }
 
   function handleLanguagePairCreated(languagePair: LanguagePair) {
@@ -88,10 +88,10 @@ export function LanguagePairsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t.languagePairs.pageTitle}</h1>
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.languagePairs.pageTitle}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{t.languagePairs.pageDescription}</p>
         </div>
 
