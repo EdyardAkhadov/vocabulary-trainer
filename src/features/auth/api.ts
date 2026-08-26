@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { AppLanguage } from '@/shared/i18n/translations';
+import { LEGAL_VERSION } from '@/shared/legal/content';
 
 export async function signUp(
   email: string,
@@ -14,6 +15,9 @@ export async function signUp(
       data: {
         nickname: nickname.trim(),
         app_language: appLanguage,
+        legal_accepted_at: new Date().toISOString(),
+        terms_version: LEGAL_VERSION,
+        privacy_version: LEGAL_VERSION,
       },
     },
   });

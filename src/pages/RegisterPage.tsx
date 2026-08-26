@@ -4,6 +4,7 @@ import { Link, Navigate } from 'react-router';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
+import { PublicMobileMenu } from '@/features/legal/PublicMobileMenu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -63,9 +64,11 @@ export function RegisterPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
+
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <main className="flex min-h-dvh items-center justify-center">
         <p className="text-sm text-muted-foreground">{t.common.loading}</p>
       </main>
     );
@@ -106,6 +109,11 @@ export function RegisterPage() {
       return;
     }
 
+    if (!acceptedLegal) {
+      setError(t.auth.legalRequired);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -121,7 +129,8 @@ export function RegisterPage() {
 
   if (success) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+      <main className="flex min-h-dvh items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+      <PublicMobileMenu className="fixed right-4 top-4 z-50" />
         <div className="w-full max-w-md text-center">
           <img src="/vocab_logo.png" alt="Vocab" className="mx-auto h-12 w-auto sm:h-14" />
 
@@ -143,7 +152,8 @@ export function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+    <main className="flex min-h-dvh items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+      <PublicMobileMenu className="fixed right-4 top-4 z-50" />
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <img src="/vocab_logo.png" alt="Vocab" className="h-12 w-auto sm:h-14" />
@@ -244,6 +254,26 @@ export function RegisterPage() {
                 disabled={isSubmitting}
               />
             </div>
+
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border bg-muted/20 p-3 text-sm leading-5">
+              <input
+                type="checkbox"
+                checked={acceptedLegal}
+                onChange={(event) => setAcceptedLegal(event.target.checked)}
+                disabled={isSubmitting}
+                className="mt-0.5 size-5 shrink-0 accent-foreground"
+              />
+              <span className="text-muted-foreground">
+                {t.auth.acceptLegalPrefix}{' '}
+                <Link to="/terms" target="_blank" className="font-medium text-foreground underline underline-offset-4">
+                  {t.auth.termsOfService}
+                </Link>{' '}
+                {t.auth.legalAnd}{' '}
+                <Link to="/privacy" target="_blank" className="font-medium text-foreground underline underline-offset-4">
+                  {t.auth.privacyPolicy}
+                </Link>.
+              </span>
+            </label>
 
             <Button type="submit" className="min-h-11 w-full" disabled={isSubmitting}>
               {isSubmitting ? t.auth.creatingAccount : t.auth.createAccount}

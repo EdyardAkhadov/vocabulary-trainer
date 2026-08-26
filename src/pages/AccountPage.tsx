@@ -194,14 +194,14 @@ export function AccountPage() {
 
   if (!user || !profile) {
     return (
-      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-8">
+      <main className="flex items-center justify-center p-8">
         <p className="text-sm text-muted-foreground">{t.common.loading}</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-10">
+    <main className="bg-background py-6 sm:py-10">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

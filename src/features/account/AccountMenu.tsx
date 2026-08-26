@@ -6,11 +6,13 @@ import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { useProfile } from '@/app/providers/ProfileProvider';
 import { Button } from '@/components/ui/button';
 import { signOut } from '@/features/auth/api';
+import { getLegalContent } from '@/shared/legal/content';
 
 export function AccountMenu() {
   const { user } = useAuth();
   const { profile } = useProfile();
-  const { t } = useAppLanguage();
+  const { language, t } = useAppLanguage();
+  const legalContent = getLegalContent(language);
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -65,7 +67,7 @@ export function AccountMenu() {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-xl border bg-popover p-2 text-popover-foreground shadow-lg"
+          className="vocab-pop-in absolute right-0 top-full z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] origin-top-right rounded-xl border bg-popover p-2 text-popover-foreground shadow-lg"
         >
           <div className="min-w-0 px-3 py-2">
             <p className="truncate font-medium">{displayName}</p>
@@ -94,6 +96,43 @@ export function AccountMenu() {
           >
             {t.account.menuProgress}
           </Link>
+
+          <div className="my-1 h-px bg-border md:hidden" />
+
+          <div className="md:hidden">
+            <Link
+              to="/about"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
+            >
+              {legalContent.footer.about}
+            </Link>
+            <Link
+              to="/contact"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
+            >
+              {legalContent.footer.contact}
+            </Link>
+            <Link
+              to="/privacy"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
+            >
+              {legalContent.footer.privacy}
+            </Link>
+            <Link
+              to="/terms"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
+            >
+              {legalContent.footer.terms}
+            </Link>
+          </div>
 
           <div className="my-1 h-px bg-border" />
 

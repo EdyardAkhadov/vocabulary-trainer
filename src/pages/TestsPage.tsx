@@ -1,52 +1,63 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
-import { useAppLanguage } from '@/app/providers/LanguageProvider'
-import { Button } from '@/components/ui/button'
-import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api'
-import { getLanguages, type Language } from '@/entities/language/api'
-import { recordStudyResult } from '@/entities/study-progress/api'
-import { getTopic, type Topic } from '@/entities/topic/api'
-import { getWordEntries, type WordEntry } from '@/entities/word-entry/api'
-import { getLanguageName } from '@/shared/i18n/language-names'
+import { useAppLanguage } from '@/app/providers/LanguageProvider';
+import { Button } from '@/components/ui/button';
+import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
+import { getLanguages, type Language } from '@/entities/language/api';
+import { getLearnedWordIds, recordStudyResult } from '@/entities/study-progress/api';
+import { getTopic, type Topic } from '@/entities/topic/api';
+import { getWordEntries, type WordEntry } from '@/entities/word-entry/api';
+import { getLanguageName } from '@/shared/i18n/language-names';
 
 type TestMode =
   | 'source-to-target'
   | 'target-to-source'
   | 'meaning-to-source'
-  | 'meaning-to-target'
+  | 'meaning-to-target';
+
+type TestScope = 'unlearned' | 'all';
+type FeedbackMode = 'immediate' | 'end';
 
 type TestQuestion = {
-  wordEntry: WordEntry
-  question: string
-  correctAnswer: string
-  options: string[]
-}
+  wordEntry: WordEntry;
+  question: string;
+  correctAnswer: string;
+  options: string[];
+};
+
+type TestAnswerRecord = {
+  wordEntryId: string;
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+};
 
 function shuffle<T>(items: T[]): T[] {
-  const result = [...items]
+  const result = [...items];
 
   for (let index = result.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1))
-    const temporary = result[index]
-    result[index] = result[randomIndex]
-    result[randomIndex] = temporary
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    const temporary = result[index];
+    result[index] = result[randomIndex];
+    result[randomIndex] = temporary;
   }
 
-  return result
+  return result;
 }
 
 function getQuestionText(wordEntry: WordEntry, mode: TestMode): string | null {
   switch (mode) {
     case 'source-to-target':
-      return wordEntry.source_text
+      return wordEntry.source_text;
     case 'target-to-source':
-      return wordEntry.target_text
+      return wordEntry.target_text;
     case 'meaning-to-source':
     case 'meaning-to-target':
-      return wordEntry.meaning
+      return wordEntry.meaning;
     default:
-      return null
+      return null;
   }
 }
 
@@ -54,45 +65,45 @@ function getAnswerText(wordEntry: WordEntry, mode: TestMode): string {
   switch (mode) {
     case 'source-to-target':
     case 'meaning-to-target':
-      return wordEntry.target_text
+      return wordEntry.target_text;
     case 'target-to-source':
     case 'meaning-to-source':
-      return wordEntry.source_text
+      return wordEntry.source_text;
   }
 }
 
 function buildQuestions(wordEntries: WordEntry[], mode: TestMode): TestQuestion[] {
   const eligibleEntries = wordEntries.filter((wordEntry) => {
     if (mode === 'meaning-to-source' || mode === 'meaning-to-target') {
-      return Boolean(wordEntry.meaning?.trim())
+      return Boolean(wordEntry.meaning?.trim());
     }
 
-    return true
-  })
+    return true;
+  });
 
   const uniqueAnswers = Array.from(
     new Set(eligibleEntries.map((wordEntry) => getAnswerText(wordEntry, mode))),
-  )
+  );
 
   if (uniqueAnswers.length < 4) {
-    return []
+    return [];
   }
 
   const questions = eligibleEntries
     .map((wordEntry): TestQuestion | null => {
-      const question = getQuestionText(wordEntry, mode)
+      const question = getQuestionText(wordEntry, mode);
 
       if (!question) {
-        return null
+        return null;
       }
 
-      const correctAnswer = getAnswerText(wordEntry, mode)
+      const correctAnswer = getAnswerText(wordEntry, mode);
       const wrongAnswers = shuffle(
         uniqueAnswers.filter((answer) => answer !== correctAnswer),
-      ).slice(0, 3)
+      ).slice(0, 3);
 
       if (wrongAnswers.length < 3) {
-        return null
+        return null;
       }
 
       return {
@@ -100,36 +111,40 @@ function buildQuestions(wordEntries: WordEntry[], mode: TestMode): TestQuestion[
         question,
         correctAnswer,
         options: shuffle([correctAnswer, ...wrongAnswers]),
-      }
+      };
     })
-    .filter((question): question is TestQuestion => question !== null)
+    .filter((question): question is TestQuestion => question !== null);
 
-  return shuffle(questions)
+  return shuffle(questions);
 }
 
 export function TestsPage() {
-  const { pairId, topicId } = useParams()
-  const { language, t } = useAppLanguage()
+  const { pairId, topicId } = useParams();
+  const { language, t } = useAppLanguage();
 
-  const [topic, setTopic] = useState<Topic | null>(null)
-  const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null)
-  const [languages, setLanguages] = useState<Language[] | null>(null)
-  const [wordEntries, setWordEntries] = useState<WordEntry[] | null>(null)
-  const [mode, setMode] = useState<TestMode>('source-to-target')
-  const [questions, setQuestions] = useState<TestQuestion[] | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-  const [correctAnswers, setCorrectAnswers] = useState(0)
-  const [isSavingResult, setIsSavingResult] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null);
+  const [languages, setLanguages] = useState<Language[] | null>(null);
+  const [wordEntries, setWordEntries] = useState<WordEntry[] | null>(null);
+  const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set());
+  const [scope, setScope] = useState<TestScope>('unlearned');
+  const [mode, setMode] = useState<TestMode>('source-to-target');
+  const [feedbackMode, setFeedbackMode] = useState<FeedbackMode>('immediate');
+  const [questions, setQuestions] = useState<TestQuestion[] | null>(null);
+  const [answers, setAnswers] = useState<TestAnswerRecord[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [isSavingResult, setIsSavingResult] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!pairId || !topicId) {
-      return
+      return;
     }
 
-    const currentPairId = pairId
-    const currentTopicId = topicId
+    const currentPairId = pairId;
+    const currentTopicId = topicId;
 
     async function loadData() {
       try {
@@ -138,184 +153,274 @@ export function TestsPage() {
           getLanguagePair(currentPairId),
           getLanguages(),
           getWordEntries(currentTopicId),
-        ])
+        ]);
 
-        setTopic(topicData)
-        setLanguagePair(pairData)
-        setLanguages(languagesData)
-        setWordEntries(wordsData)
+        const learnedIds = await getLearnedWordIds(wordsData.map((word) => word.id));
+
+        setTopic(topicData);
+        setLanguagePair(pairData);
+        setLanguages(languagesData);
+        setWordEntries(wordsData);
+        setLearnedWordIds(learnedIds);
       } catch (err) {
-        setError(err instanceof Error ? err.message : t.errors.loadTest)
+        setError(err instanceof Error ? err.message : t.errors.loadTest);
       }
     }
 
-    void loadData()
-  }, [pairId, topicId, t.errors.loadTest])
+    void loadData();
+  }, [pairId, topicId, t.errors.loadTest]);
 
   const sourceLanguage = useMemo(() => {
     if (!languagePair || !languages) {
-      return null
+      return null;
     }
 
-    return languages.find((item) => item.id === languagePair.source_language_id) ?? null
-  }, [languagePair, languages])
+    return languages.find((item) => item.id === languagePair.source_language_id) ?? null;
+  }, [languagePair, languages]);
 
   const targetLanguage = useMemo(() => {
     if (!languagePair || !languages) {
-      return null
+      return null;
     }
 
-    return languages.find((item) => item.id === languagePair.target_language_id) ?? null
-  }, [languagePair, languages])
+    return languages.find((item) => item.id === languagePair.target_language_id) ?? null;
+  }, [languagePair, languages]);
 
   if (!pairId || !topicId) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <p className="text-destructive">{t.errors.loadTest}</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (error && !topic) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← {t.test.backToTopic}
+            × {t.test.exit}
           </Link>
           <p className="mt-6 text-destructive">{error}</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (!topic || !languagePair || !languages || !wordEntries) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
-    )
+    );
   }
 
-  const words = wordEntries
+  const words = wordEntries;
+  const unlearnedWords = words.filter((word) => !learnedWordIds.has(word.id));
+  const learnedCount = words.length - unlearnedWords.length;
+  const selectedWords = scope === 'all' ? words : unlearnedWords;
 
   const sourceLanguageName = sourceLanguage
     ? getLanguageName(sourceLanguage.code, language, sourceLanguage.native_name || sourceLanguage.name)
-    : t.languagePairs.language1
+    : t.languagePairs.language1;
 
   const targetLanguageName = targetLanguage
     ? getLanguageName(targetLanguage.code, language, targetLanguage.native_name || targetLanguage.name)
-    : t.languagePairs.language2
+    : t.languagePairs.language2;
 
   function startTest() {
-    setError(null)
+    setError(null);
 
-    const generatedQuestions = buildQuestions(words, mode)
-
-    if (generatedQuestions.length === 0) {
-      setError(mode.startsWith('meaning') ? t.test.meaningNeedsFour : t.test.needsFour)
-      return
+    if (scope === 'unlearned' && selectedWords.length === 0) {
+      setError(t.test.noUnlearnedWords);
+      return;
     }
 
-    setQuestions(generatedQuestions)
-    setCurrentIndex(0)
-    setSelectedAnswer(null)
-    setCorrectAnswers(0)
+    const generatedQuestions = buildQuestions(selectedWords, mode);
+
+    if (generatedQuestions.length === 0) {
+      setError(mode.startsWith('meaning') ? t.test.meaningNeedsFour : t.test.needsFour);
+      return;
+    }
+
+    setQuestions(generatedQuestions);
+    setAnswers([]);
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setCorrectAnswers(0);
   }
 
   async function selectAnswer(answer: string) {
     if (selectedAnswer !== null || !questions) {
-      return
+      return;
     }
 
-    const currentQuestion = questions[currentIndex]
-    const isCorrect = answer === currentQuestion.correctAnswer
+    const currentQuestion = questions[currentIndex];
+    const isCorrect = answer === currentQuestion.correctAnswer;
 
-    setSelectedAnswer(answer)
+    setSelectedAnswer(answer);
+    setAnswers((current) => [
+      ...current,
+      {
+        wordEntryId: currentQuestion.wordEntry.id,
+        question: currentQuestion.question,
+        selectedAnswer: answer,
+        correctAnswer: currentQuestion.correctAnswer,
+        isCorrect,
+      },
+    ]);
 
     if (isCorrect) {
-      setCorrectAnswers((current) => current + 1)
+      setCorrectAnswers((current) => current + 1);
     }
 
     try {
-      setIsSavingResult(true)
-      await recordStudyResult(currentQuestion.wordEntry.id, isCorrect)
+      setIsSavingResult(true);
+      await recordStudyResult(currentQuestion.wordEntry.id, isCorrect);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t.errors.saveProgress)
+      setError(err instanceof Error ? err.message : t.errors.saveProgress);
     } finally {
-      setIsSavingResult(false)
+      setIsSavingResult(false);
     }
   }
 
   function nextQuestion() {
-    setCurrentIndex((current) => current + 1)
-    setSelectedAnswer(null)
+    setCurrentIndex((current) => current + 1);
+    setSelectedAnswer(null);
   }
 
   function restartTest() {
-    setQuestions(null)
-    setCurrentIndex(0)
-    setSelectedAnswer(null)
-    setCorrectAnswers(0)
-    setError(null)
+    setQuestions(null);
+    setAnswers([]);
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setCorrectAnswers(0);
+    setError(null);
   }
 
   if (words.length === 0) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link
             to={`/pair/${pairId}/topic/${topicId}`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← {t.common.back}: {topic.name}
+            × {t.test.exit}
           </Link>
 
-          <div className="mt-8 rounded-xl border border-dashed p-6 text-center sm:p-8">
+          <div className="mt-6 rounded-xl border border-dashed p-6 text-center sm:p-8">
             <h1 className="text-xl font-semibold">{t.test.noWords}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{t.test.noWordsDescription}</p>
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   if (questions === null) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <Link
-            to={`/pair/${pairId}/topic/${topicId}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← {t.common.back}: {topic.name}
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to={`/pair/${pairId}/topic/${topicId}`}
+              className="inline-flex min-h-9 items-center rounded-lg border border-input bg-background px-3 text-xs font-medium transition-colors hover:bg-muted sm:text-sm"
+            >
+              × {t.test.exit}
+            </Link>
 
-          <div className="mt-6">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.test.title}</h1>
-            <p className="mt-2 text-muted-foreground">{topic.name}</p>
+            <p className="hidden truncate text-sm font-medium text-muted-foreground sm:block">
+              {topic.name}
+            </p>
           </div>
 
+          <section className="mt-4 rounded-2xl border bg-card p-4 sm:mt-6 sm:p-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">{t.words.learnedProgress}</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {learnedCount} / {words.length}
+                </p>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                {t.cards.remaining}:{' '}
+                <span className="font-semibold text-foreground">{unlearnedWords.length}</span>
+              </p>
+            </div>
+          </section>
+
           {error && (
-            <div className="mt-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            <div className="mt-4 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <section className="mt-8 rounded-xl border bg-card p-4 sm:p-6">
-            <h2 className="text-xl font-semibold">{t.test.mode}</h2>
+          <section className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
+            <h2 className="text-lg font-semibold sm:text-xl">{t.test.wordScope}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t.test.wordScopeDescription}</p>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant={scope === 'unlearned' ? 'default' : 'outline'}
+                className="h-auto min-h-12 whitespace-normal px-4 py-3"
+                onClick={() => setScope('unlearned')}
+              >
+                {t.test.unlearnedOnly} ({unlearnedWords.length})
+              </Button>
+
+              <Button
+                type="button"
+                variant={scope === 'all' ? 'default' : 'outline'}
+                className="h-auto min-h-12 whitespace-normal px-4 py-3"
+                onClick={() => setScope('all')}
+              >
+                {t.test.allWords} ({words.length})
+              </Button>
+            </div>
+          </section>
+
+          <section className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
+            <h2 className="text-lg font-semibold sm:text-xl">{t.test.feedbackTiming}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t.test.feedbackTimingDescription}</p>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant={feedbackMode === 'immediate' ? 'default' : 'outline'}
+                className="h-auto min-h-12 whitespace-normal px-4 py-3"
+                onClick={() => setFeedbackMode('immediate')}
+              >
+                {t.test.feedbackImmediate}
+              </Button>
+
+              <Button
+                type="button"
+                variant={feedbackMode === 'end' ? 'default' : 'outline'}
+                className="h-auto min-h-12 whitespace-normal px-4 py-3"
+                onClick={() => setFeedbackMode('end')}
+              >
+                {t.test.feedbackAtEnd}
+              </Button>
+            </div>
+          </section>
+
+          <section className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
+            <h2 className="text-lg font-semibold sm:text-xl">{t.test.mode}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t.test.modeDescription}</p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Button
                 type="button"
                 variant={mode === 'source-to-target' ? 'default' : 'outline'}
-                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
+                className="h-auto min-h-12 whitespace-normal px-4 py-3 sm:min-h-14"
                 onClick={() => setMode('source-to-target')}
               >
                 {sourceLanguageName} → {targetLanguageName}
@@ -324,7 +429,7 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'target-to-source' ? 'default' : 'outline'}
-                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
+                className="h-auto min-h-12 whitespace-normal px-4 py-3 sm:min-h-14"
                 onClick={() => setMode('target-to-source')}
               >
                 {targetLanguageName} → {sourceLanguageName}
@@ -333,7 +438,7 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'meaning-to-source' ? 'default' : 'outline'}
-                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
+                className="h-auto min-h-12 whitespace-normal px-4 py-3 sm:min-h-14"
                 onClick={() => setMode('meaning-to-source')}
               >
                 {t.words.meaning} → {sourceLanguageName}
@@ -342,29 +447,29 @@ export function TestsPage() {
               <Button
                 type="button"
                 variant={mode === 'meaning-to-target' ? 'default' : 'outline'}
-                className="h-auto min-h-14 whitespace-normal px-4 py-3 sm:min-h-16"
+                className="h-auto min-h-12 whitespace-normal px-4 py-3 sm:min-h-14"
                 onClick={() => setMode('meaning-to-target')}
               >
                 {t.words.meaning} → {targetLanguageName}
               </Button>
             </div>
 
-            <Button type="button" className="mt-6 min-h-11 w-full" onClick={startTest}>
+            <Button type="button" variant="brand" className="mt-5 min-h-11 w-full" onClick={startTest}>
               {t.test.start}
             </Button>
           </section>
         </div>
       </main>
-    )
+    );
   }
 
   if (currentIndex >= questions.length) {
-    const percentage = Math.round((correctAnswers / questions.length) * 100)
+    const percentage = Math.round((correctAnswers / questions.length) * 100);
 
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-4 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <div className="rounded-2xl border bg-card p-5 text-center sm:p-8">
+          <div className="vocab-pop-in rounded-2xl border bg-card p-5 text-center sm:p-8">
             <p className="text-sm text-muted-foreground">{t.test.complete}</p>
             <h1 className="mt-3 text-4xl font-bold">{percentage}%</h1>
             <p className="mt-3 text-muted-foreground">
@@ -384,64 +489,116 @@ export function TestsPage() {
               </Link>
             </div>
           </div>
+
+          {feedbackMode === 'end' && answers.length > 0 && (
+            <section className="mt-4 rounded-2xl border bg-card p-4 sm:mt-6 sm:p-6">
+              <h2 className="text-xl font-semibold">{t.test.reviewAnswers}</h2>
+
+              <div className="mt-4 space-y-3">
+                {answers.map((answer, index) => (
+                  <div
+                    key={`${answer.wordEntryId}-${index}`}
+                    className="rounded-xl border bg-background p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="wrap-break-word font-semibold">{answer.question}</p>
+                      <span
+                        className={
+                          answer.isCorrect
+                            ? 'shrink-0 text-sm font-semibold text-green-700 dark:text-green-400'
+                            : 'shrink-0 text-sm font-semibold text-destructive'
+                        }
+                      >
+                        {answer.isCorrect ? t.test.correct : t.test.wrong}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 text-sm">
+                      <span className="text-muted-foreground">{t.test.yourAnswer}: </span>
+                      <strong>{answer.selectedAnswer}</strong>
+                    </p>
+
+                    {!answer.isCorrect && (
+                      <p className="mt-1 text-sm">
+                        <span className="text-muted-foreground">{t.test.correctAnswer}: </span>
+                        <strong>{answer.correctAnswer}</strong>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </main>
-    )
+    );
   }
 
-  const currentQuestion = questions[currentIndex]
-  const isAnswered = selectedAnswer !== null
-  const selectedWasCorrect = selectedAnswer === currentQuestion.correctAnswer
+  const currentQuestion = questions[currentIndex];
+  const isAnswered = selectedAnswer !== null;
+  const selectedWasCorrect = selectedAnswer === currentQuestion.correctAnswer;
+  const progressPercentage = Math.round(((currentIndex + 1) / questions.length) * 100);
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-5 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+    <main className="bg-background py-4 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-        <Link
-          to={`/pair/${pairId}/topic/${topicId}`}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← {t.test.exit}
-        </Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link
+            to={`/pair/${pairId}/topic/${topicId}`}
+            className="inline-flex min-h-9 items-center rounded-lg border border-input bg-background px-3 text-xs font-medium transition-colors hover:bg-muted sm:text-sm"
+          >
+            × {t.test.exit}
+          </Link>
 
-        <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{topic.name}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t.test.question} {currentIndex + 1} {t.common.of} {questions.length}
-            </p>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            {correctAnswers} {t.test.correctCount}
+          <p className="text-xs font-medium text-muted-foreground sm:text-sm">
+            {t.test.question} {currentIndex + 1} / {questions.length}
           </p>
         </div>
 
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-foreground transition-[width] duration-300"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+
+        <div className="mt-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span className="hidden truncate sm:block">{topic.name}</span>
+          {feedbackMode === 'immediate' && (
+            <span className="ml-auto">
+              {correctAnswers} {t.test.correctCount}
+            </span>
+          )}
+        </div>
+
         {error && (
-          <div className="mt-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+          <div className="mt-4 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
             {error}
           </div>
         )}
 
-        <section className="mt-8 rounded-2xl border bg-card p-4 sm:p-8">
+        <section key={currentQuestion.wordEntry.id} className="vocab-card-enter mt-4 rounded-2xl border bg-card p-4 sm:mt-6 sm:p-8">
           <p className="text-center text-sm text-muted-foreground">{t.test.chooseAnswer}</p>
 
-          <p className="mt-6 wrap-break-word text-center text-3xl font-semibold sm:text-4xl">
+          <p className="mt-5 wrap-break-word text-center text-3xl font-semibold sm:mt-6 sm:text-4xl">
             {currentQuestion.question}
           </p>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+          <div className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2">
             {currentQuestion.options.map((option) => {
-              const isCorrectOption = option === currentQuestion.correctAnswer
-              const isSelected = option === selectedAnswer
+              const isCorrectOption = option === currentQuestion.correctAnswer;
+              const isSelected = option === selectedAnswer;
 
-              let optionClassName = 'min-h-14 h-auto whitespace-normal px-4 py-3 text-base sm:min-h-16'
+              let optionClassName = 'min-h-14 h-auto whitespace-normal px-4 py-3 text-base sm:min-h-16';
 
-              if (isAnswered) {
+              if (isAnswered && feedbackMode === 'immediate') {
                 if (isCorrectOption) {
-                  optionClassName += ' border-green-600 bg-green-500/10 text-green-700 dark:text-green-400'
+                  optionClassName += ' border-green-600 bg-green-500/10 text-green-700 dark:text-green-400';
                 } else if (isSelected) {
-                  optionClassName += ' border-destructive bg-destructive/10 text-destructive'
+                  optionClassName += ' border-destructive bg-destructive/10 text-destructive';
                 }
+              } else if (isAnswered && feedbackMode === 'end' && isSelected) {
+                optionClassName += ' border-foreground bg-muted text-foreground';
               }
 
               return (
@@ -455,12 +612,12 @@ export function TestsPage() {
                 >
                   {option}
                 </Button>
-              )
+              );
             })}
           </div>
 
-          {isAnswered && (
-            <div className="mt-8 border-t pt-6">
+          {isAnswered && feedbackMode === 'immediate' && (
+            <div className="mt-6 border-t pt-5 sm:mt-8 sm:pt-6">
               <p
                 className={
                   selectedWasCorrect
@@ -485,18 +642,27 @@ export function TestsPage() {
 
               <Button
                 type="button"
-                className="mt-6 min-h-11 w-full"
+                className="mt-5 min-h-11 w-full sm:mt-6"
                 disabled={isSavingResult}
                 onClick={nextQuestion}
               >
-                {currentIndex === questions.length - 1
-                  ? t.test.seeResults
-                  : t.test.nextQuestion}
+                {currentIndex === questions.length - 1 ? t.test.seeResults : t.test.nextQuestion}
               </Button>
             </div>
+          )}
+
+          {isAnswered && feedbackMode === 'end' && (
+            <Button
+              type="button"
+              className="mt-5 min-h-11 w-full"
+              disabled={isSavingResult}
+              onClick={nextQuestion}
+            >
+              {currentIndex === questions.length - 1 ? t.test.seeResults : t.test.nextQuestion}
+            </Button>
           )}
         </section>
       </div>
     </main>
-  )
+  );
 }

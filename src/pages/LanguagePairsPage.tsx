@@ -88,7 +88,7 @@ export function LanguagePairsPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+    <main className="bg-background py-6 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.languagePairs.pageTitle}</h1>

@@ -28,7 +28,7 @@ export function ProgressPage() {
   }, [t]);
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-10">
+    <main className="bg-background py-6 sm:py-10">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>

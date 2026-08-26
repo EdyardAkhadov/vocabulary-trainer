@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router';
 import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { getLanguagePair, type LanguagePair } from '@/entities/language-pair/api';
 import { getLanguages, type Language } from '@/entities/language/api';
+import { getLearnedWordIds, setWordLearned } from '@/entities/study-progress/api';
 import { getTopic, type Topic } from '@/entities/topic/api';
 import { deleteWordEntry, getWordEntries, type WordEntry } from '@/entities/word-entry/api';
 import { CreateWordEntryForm } from '@/features/word-entry/create/CreateWordEntryForm';
@@ -19,6 +20,8 @@ export function TopicPage() {
   const [languagePair, setLanguagePair] = useState<LanguagePair | null>(null);
   const [languages, setLanguages] = useState<Language[] | null>(null);
   const [wordEntries, setWordEntries] = useState<WordEntry[] | null>(null);
+  const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set());
+  const [updatingLearnedWordId, setUpdatingLearnedWordId] = useState<string | null>(null);
   const [editingWordEntry, setEditingWordEntry] = useState<WordEntry | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,10 +42,13 @@ export function TopicPage() {
           getWordEntries(currentTopicId),
         ]);
 
+        const learnedIds = await getLearnedWordIds(wordsData.map((word) => word.id));
+
         setTopic(topicData);
         setLanguagePair(pairData);
         setLanguages(languagesData);
         setWordEntries(wordsData);
+        setLearnedWordIds(learnedIds);
       } catch (err) {
         setError(err instanceof Error ? err.message : t.errors.loadTopic);
       }
@@ -53,7 +59,7 @@ export function TopicPage() {
 
   if (!pairId || !topicId) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
@@ -66,7 +72,7 @@ export function TopicPage() {
 
   if (error && !topic) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
@@ -79,7 +85,7 @@ export function TopicPage() {
 
   if (!topic || !languagePair || !languages || !wordEntries) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
     );
@@ -99,6 +105,11 @@ export function TopicPage() {
     ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
     : t.common.unknown;
 
+  const totalWords = wordEntries.length;
+  const learnedCount = wordEntries.filter((word) => learnedWordIds.has(word.id)).length;
+  const remainingCount = Math.max(0, totalWords - learnedCount);
+  const learnedPercentage = totalWords > 0 ? Math.round((learnedCount / totalWords) * 100) : 0;
+
   function handleWordCreated(wordEntry: WordEntry) {
     setWordEntries((current) => (current ? [...current, wordEntry] : [wordEntry]));
   }
@@ -112,6 +123,31 @@ export function TopicPage() {
         : [updatedWordEntry],
     );
     setEditingWordEntry(null);
+  }
+
+  async function handleWordLearnedChange(wordEntry: WordEntry, isLearned: boolean) {
+    setError(null);
+    setUpdatingLearnedWordId(wordEntry.id);
+
+    try {
+      await setWordLearned(wordEntry.id, isLearned);
+
+      setLearnedWordIds((current) => {
+        const next = new Set(current);
+
+        if (isLearned) {
+          next.add(wordEntry.id);
+        } else {
+          next.delete(wordEntry.id);
+        }
+
+        return next;
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.errors.saveProgress);
+    } finally {
+      setUpdatingLearnedWordId(null);
+    }
   }
 
   async function handleWordDelete(wordEntry: WordEntry) {
@@ -130,6 +166,11 @@ export function TopicPage() {
       setWordEntries((current) =>
         current ? current.filter((currentWordEntry) => currentWordEntry.id !== wordEntry.id) : [],
       );
+      setLearnedWordIds((current) => {
+        const next = new Set(current);
+        next.delete(wordEntry.id);
+        return next;
+      });
 
       if (editingWordEntry?.id === wordEntry.id) {
         setEditingWordEntry(null);
@@ -140,7 +181,7 @@ export function TopicPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+    <main className="bg-background py-6 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}: {languagePair.name}
@@ -153,16 +194,38 @@ export function TopicPage() {
           </p>
         </div>
 
+        <section className="mt-6 rounded-2xl border bg-card p-4 sm:p-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">{t.words.learnedProgress}</p>
+              <p className="mt-1 text-2xl font-bold">
+                {learnedCount} / {totalWords}
+              </p>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              {t.cards.remaining}: <span className="font-semibold text-foreground">{remainingCount}</span>
+            </p>
+          </div>
+
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-300"
+              style={{ width: `${learnedPercentage}%` }}
+            />
+          </div>
+        </section>
+
         <div className="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
           <Link
             to={`/pair/${pairId}/topic/${topicId}/cards`}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-brand bg-brand/5 px-4 text-sm font-semibold text-brand transition-colors hover:bg-brand/10"
           >
             {t.study.studyCards}
           </Link>
           <Link
             to={`/pair/${pairId}/topic/${topicId}/test`}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand px-4 text-sm font-semibold text-brand-foreground transition-colors hover:bg-brand/90"
           >
             {t.study.takeTest}
           </Link>
@@ -197,10 +260,13 @@ export function TopicPage() {
 
         <WordEntryList
           wordEntries={wordEntries}
+          learnedWordIds={learnedWordIds}
+          updatingLearnedWordId={updatingLearnedWordId}
           sourceLanguageName={sourceLanguageName}
           targetLanguageName={targetLanguageName}
           onEdit={setEditingWordEntry}
           onDelete={handleWordDelete}
+          onLearnedChange={handleWordLearnedChange}
         />
       </div>
     </main>

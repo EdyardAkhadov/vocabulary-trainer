@@ -94,7 +94,7 @@ export function CreateWordEntryForm({
           />
         </div>
 
-        <Button type="submit" disabled={isCreating} className="min-h-11 w-full sm:w-auto">
+        <Button type="submit" disabled={isCreating} className="min-h-11 w-full bg-brand text-brand-foreground shadow-sm hover:bg-brand/90 sm:w-auto">
           {isCreating ? t.words.adding : t.words.addButton}
         </Button>
       </form>

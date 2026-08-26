@@ -4,6 +4,7 @@ import { Link, Navigate } from 'react-router';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useAppLanguage } from '@/app/providers/LanguageProvider';
 import { Button } from '@/components/ui/button';
+import { PublicMobileMenu } from '@/features/legal/PublicMobileMenu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signIn } from '@/features/auth/api';
@@ -23,7 +24,7 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <main className="flex min-h-dvh items-center justify-center">
         <p className="text-sm text-muted-foreground">{t.common.loading}</p>
       </main>
     );
@@ -57,7 +58,8 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+    <main className="flex min-h-dvh items-center justify-center bg-muted/30 px-4 py-6 sm:p-6">
+      <PublicMobileMenu className="fixed right-4 top-4 z-50" />
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <img src="/vocab_logo.png" alt="Vocab" className="h-12 w-auto sm:h-14" />

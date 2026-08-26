@@ -48,7 +48,7 @@ export function LanguagePairPage() {
 
   if (!pairId) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
@@ -61,7 +61,7 @@ export function LanguagePairPage() {
 
   if (error && !languagePair) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
@@ -74,7 +74,7 @@ export function LanguagePairPage() {
 
   if (!languagePair || !languages || !topics) {
     return (
-      <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+      <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">{t.common.loading}</div>
       </main>
     );
@@ -133,7 +133,7 @@ export function LanguagePairPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-background py-6 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+    <main className="bg-background py-6 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}

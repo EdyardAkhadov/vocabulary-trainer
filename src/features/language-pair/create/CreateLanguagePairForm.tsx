@@ -134,7 +134,7 @@ export function CreateLanguagePairForm({
           />
         </div>
 
-        <Button type="submit" disabled={isCreating} className="min-h-11 w-full">
+        <Button type="submit" disabled={isCreating} className="min-h-11 w-full bg-brand text-brand-foreground shadow-sm hover:bg-brand/90">
           {isCreating ? t.languagePairs.creating : t.languagePairs.createButton}
         </Button>
       </form>
