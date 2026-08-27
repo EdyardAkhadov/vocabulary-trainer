@@ -10,9 +10,10 @@ type CreateTopicFormProps = {
   languagePairId: string;
   onCreated: (topic: Topic) => void;
   onError: (message: string) => void;
+  onCancel?: () => void;
 };
 
-export function CreateTopicForm({ languagePairId, onCreated, onError }: CreateTopicFormProps) {
+export function CreateTopicForm({ languagePairId, onCreated, onError, onCancel }: CreateTopicFormProps) {
   const { t } = useAppLanguage();
   const [name, setName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -57,9 +58,17 @@ export function CreateTopicForm({ languagePairId, onCreated, onError }: CreateTo
           />
         </div>
 
-        <Button type="submit" disabled={isCreating} className="min-h-11 w-full bg-brand text-brand-foreground shadow-sm hover:bg-brand/90 sm:w-auto">
-          {isCreating ? t.topics.creating : t.topics.createButton}
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="submit" disabled={isCreating} className="min-h-11 w-full bg-brand text-brand-foreground shadow-sm hover:bg-brand/90 sm:flex-1">
+            {isCreating ? t.topics.creating : t.topics.createButton}
+          </Button>
+
+          {onCancel && (
+            <Button type="button" variant="outline" className="min-h-11 w-full sm:w-auto" onClick={onCancel} disabled={isCreating}>
+              {t.common.cancel}
+            </Button>
+          )}
+        </div>
       </form>
     </section>
   );

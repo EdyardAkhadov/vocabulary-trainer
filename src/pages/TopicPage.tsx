@@ -23,6 +23,7 @@ export function TopicPage() {
   const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set());
   const [updatingLearnedWordId, setUpdatingLearnedWordId] = useState<string | null>(null);
   const [editingWordEntry, setEditingWordEntry] = useState<WordEntry | null>(null);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export function TopicPage() {
     return (
       <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/app" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
           <p className="mt-6 text-destructive">{t.topics.notFound}</p>
@@ -74,7 +75,7 @@ export function TopicPage() {
     return (
       <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to={`/app/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
           <p className="mt-6 text-destructive">{error}</p>
@@ -98,20 +99,26 @@ export function TopicPage() {
     (language) => language.id === languagePair.target_language_id,
   );
 
-  const sourceLanguageName = sourceLanguage
-    ? getLanguageName(sourceLanguage.code, appLanguage, sourceLanguage.name)
-    : t.common.unknown;
-  const targetLanguageName = targetLanguage
-    ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
-    : t.common.unknown;
+  const sourceLanguageName = languagePair.source_language_custom?.trim()
+    || (sourceLanguage
+      ? getLanguageName(sourceLanguage.code, appLanguage, sourceLanguage.name)
+      : t.common.unknown);
+  const targetLanguageName = languagePair.target_language_custom?.trim()
+    || (targetLanguage
+      ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
+      : t.common.unknown);
 
   const totalWords = wordEntries.length;
   const learnedCount = wordEntries.filter((word) => learnedWordIds.has(word.id)).length;
   const remainingCount = Math.max(0, totalWords - learnedCount);
   const learnedPercentage = totalWords > 0 ? Math.round((learnedCount / totalWords) * 100) : 0;
 
+  const hasWords = wordEntries.length > 0;
+  const showCreateForm = !hasWords || isCreateFormOpen;
+
   function handleWordCreated(wordEntry: WordEntry) {
     setWordEntries((current) => (current ? [...current, wordEntry] : [wordEntry]));
+    setIsCreateFormOpen(false);
   }
 
   function handleWordUpdated(updatedWordEntry: WordEntry) {
@@ -183,7 +190,7 @@ export function TopicPage() {
   return (
     <main className="bg-background py-6 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-        <Link to={`/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
+        <Link to={`/app/pair/${pairId}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}: {languagePair.name}
         </Link>
 
@@ -218,13 +225,13 @@ export function TopicPage() {
 
         <div className="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
           <Link
-            to={`/pair/${pairId}/topic/${topicId}/cards`}
+            to={`/app/pair/${pairId}/topic/${topicId}/cards`}
             className="inline-flex min-h-11 items-center justify-center rounded-lg border border-brand bg-brand/5 px-4 text-sm font-semibold text-brand transition-colors hover:bg-brand/10"
           >
             {t.study.studyCards}
           </Link>
           <Link
-            to={`/pair/${pairId}/topic/${topicId}/test`}
+            to={`/app/pair/${pairId}/topic/${topicId}/test`}
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand px-4 text-sm font-semibold text-brand-foreground transition-colors hover:bg-brand/90"
           >
             {t.study.takeTest}
@@ -237,15 +244,19 @@ export function TopicPage() {
           </div>
         )}
 
-        <div className="mt-6 sm:mt-8">
-          <CreateWordEntryForm
-            topicId={topicId}
-            sourceLanguageName={sourceLanguageName}
-            targetLanguageName={targetLanguageName}
-            onCreated={handleWordCreated}
-            onError={setError}
-          />
-        </div>
+        {showCreateForm && (
+          <div className="mt-6 sm:mt-8">
+            <CreateWordEntryForm
+              pairId={pairId}
+              topicId={topicId}
+              sourceLanguageName={sourceLanguageName}
+              targetLanguageName={targetLanguageName}
+              onCreated={handleWordCreated}
+              onError={setError}
+              onCancel={hasWords ? () => setIsCreateFormOpen(false) : undefined}
+            />
+          </div>
+        )}
 
         {editingWordEntry && (
           <EditWordEntryForm
@@ -258,16 +269,25 @@ export function TopicPage() {
           />
         )}
 
-        <WordEntryList
-          wordEntries={wordEntries}
-          learnedWordIds={learnedWordIds}
-          updatingLearnedWordId={updatingLearnedWordId}
-          sourceLanguageName={sourceLanguageName}
-          targetLanguageName={targetLanguageName}
-          onEdit={setEditingWordEntry}
-          onDelete={handleWordDelete}
-          onLearnedChange={handleWordLearnedChange}
-        />
+        {hasWords && (
+          <WordEntryList
+            wordEntries={wordEntries}
+            learnedWordIds={learnedWordIds}
+            updatingLearnedWordId={updatingLearnedWordId}
+            sourceLanguageName={sourceLanguageName}
+            targetLanguageName={targetLanguageName}
+            onAdd={!isCreateFormOpen ? () => {
+              setEditingWordEntry(null);
+              setIsCreateFormOpen(true);
+            } : undefined}
+            onEdit={(wordEntry) => {
+              setIsCreateFormOpen(false);
+              setEditingWordEntry(wordEntry);
+            }}
+            onDelete={handleWordDelete}
+            onLearnedChange={handleWordLearnedChange}
+          />
+        )}
       </div>
     </main>
   );

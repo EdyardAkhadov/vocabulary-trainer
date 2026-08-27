@@ -18,6 +18,7 @@ export function LanguagePairPage() {
   const [languages, setLanguages] = useState<Language[] | null>(null);
   const [topics, setTopics] = useState<Topic[] | null>(null);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export function LanguagePairPage() {
     return (
       <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/app" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
           <p className="mt-6 text-destructive">{t.languagePairs.notFound}</p>
@@ -63,7 +64,7 @@ export function LanguagePairPage() {
     return (
       <main className="bg-background py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/app" className="text-sm text-muted-foreground hover:text-foreground">
             ← {t.common.back}
           </Link>
           <p className="mt-6 text-destructive">{error}</p>
@@ -87,15 +88,21 @@ export function LanguagePairPage() {
     (language) => language.id === languagePair.target_language_id,
   );
 
-  const sourceLanguageName = sourceLanguage
-    ? getLanguageName(sourceLanguage.code, appLanguage, sourceLanguage.name)
-    : t.common.unknown;
-  const targetLanguageName = targetLanguage
-    ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
-    : t.common.unknown;
+  const sourceLanguageName = languagePair.source_language_custom?.trim()
+    || (sourceLanguage
+      ? getLanguageName(sourceLanguage.code, appLanguage, sourceLanguage.name)
+      : t.common.unknown);
+  const targetLanguageName = languagePair.target_language_custom?.trim()
+    || (targetLanguage
+      ? getLanguageName(targetLanguage.code, appLanguage, targetLanguage.name)
+      : t.common.unknown);
+
+  const hasTopics = topics.length > 0;
+  const showCreateForm = !hasTopics || isCreateFormOpen;
 
   function handleTopicCreated(topic: Topic) {
     setTopics((current) => (current ? [...current, topic] : [topic]));
+    setIsCreateFormOpen(false);
   }
 
   function handleTopicUpdated(updatedTopic: Topic) {
@@ -127,6 +134,7 @@ export function LanguagePairPage() {
       if (editingTopic?.id === topic.id) {
         setEditingTopic(null);
       }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : t.errors.deleteTopic);
     }
@@ -135,7 +143,7 @@ export function LanguagePairPage() {
   return (
     <main className="bg-background py-6 sm:py-8">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/app" className="text-sm text-muted-foreground hover:text-foreground">
           ← {t.common.back}
         </Link>
 
@@ -152,13 +160,25 @@ export function LanguagePairPage() {
           </div>
         )}
 
-        <div className="mt-6 sm:mt-8">
-          <CreateTopicForm
-            languagePairId={pairId}
-            onCreated={handleTopicCreated}
-            onError={setError}
-          />
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            to={`/app/pair/${pairId}/dictionary`}
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-brand bg-brand/5 px-4 text-sm font-semibold text-brand transition-colors hover:bg-brand/10 sm:w-auto"
+          >
+            {t.vocabulary.openDictionary}
+          </Link>
         </div>
+
+        {showCreateForm && (
+          <div className="mt-6 sm:mt-8">
+            <CreateTopicForm
+              languagePairId={pairId}
+              onCreated={handleTopicCreated}
+              onError={setError}
+              onCancel={hasTopics ? () => setIsCreateFormOpen(false) : undefined}
+            />
+          </div>
+        )}
 
         {editingTopic && (
           <EditTopicForm
@@ -169,7 +189,20 @@ export function LanguagePairPage() {
           />
         )}
 
-        <TopicList topics={topics} onEdit={setEditingTopic} onDelete={handleTopicDelete} />
+        {hasTopics && (
+          <TopicList
+            topics={topics}
+            onAdd={!isCreateFormOpen ? () => {
+              setEditingTopic(null);
+              setIsCreateFormOpen(true);
+            } : undefined}
+            onEdit={(topic) => {
+              setIsCreateFormOpen(false);
+              setEditingTopic(topic);
+            }}
+            onDelete={handleTopicDelete}
+          />
+        )}
       </div>
     </main>
   );

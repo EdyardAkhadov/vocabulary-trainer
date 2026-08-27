@@ -6,18 +6,31 @@ import type { Topic } from '@/entities/topic/api';
 
 type TopicListProps = {
   topics: Topic[];
+  onAdd?: () => void;
   onEdit: (topic: Topic) => void;
   onDelete: (topic: Topic) => void;
 };
 
-export function TopicList({ topics, onEdit, onDelete }: TopicListProps) {
+export function TopicList({ topics, onAdd, onEdit, onDelete }: TopicListProps) {
   const { t } = useAppLanguage();
 
   return (
     <section className="mt-8 sm:mt-10">
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold">{t.topics.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t.topics.description}</p>
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">{t.topics.title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t.topics.description}</p>
+        </div>
+
+        {onAdd && (
+          <Button
+            type="button"
+            className="min-h-11 w-full bg-brand text-brand-foreground hover:bg-brand/90 sm:w-auto"
+            onClick={onAdd}
+          >
+            + {t.topics.createButton}
+          </Button>
+        )}
       </div>
 
       {topics.length === 0 ? (
@@ -29,7 +42,7 @@ export function TopicList({ topics, onEdit, onDelete }: TopicListProps) {
         <div className="grid gap-3">
           {topics.map((topic) => (
             <article key={topic.id} className="rounded-xl border bg-card p-4 sm:p-5">
-              <Link to={`/pair/${topic.language_pair_id}/topic/${topic.id}`} className="block min-w-0">
+              <Link to={`/app/pair/${topic.language_pair_id}/topic/${topic.id}`} className="block min-w-0">
                 <p className="wrap-break-word font-medium hover:underline">{topic.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t.topics.openTopic}</p>
               </Link>

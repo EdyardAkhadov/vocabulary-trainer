@@ -1,0 +1,4 @@
+# Add these values to your real .env when you have a production domain.
+# Do not copy secrets into this file.
+VITE_SITE_URL=https://YOUR-DOMAIN.com
+VITE_SOCIAL_IMAGE_URL=https://YOUR-DOMAIN.com/og-image.png
